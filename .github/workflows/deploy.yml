@@ -10,22 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Git checkout 🛎️
-      uses: actions/checkout@v2
+      - name: Git checkout 🛎️
+        uses: actions/checkout@v2
 
-    - name: Specify node version
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16.x'
-    
-    - name: Install and Build
-      run: |
-        npm ci # faster than npm install
-        npm run build
-    
-    - name: Deploy 🚀
-      uses: JamesIves/github-pages-deploy-action@v4.2.3
-      with:
-        branch: deploy
-        folder: out # The folder the action should deploy.
-      
+      - name: Specify node version
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+
+      - name: Install and Build
+        run: |
+          npm ci # faster than npm install
+          npm run build
+
+      - name: Create .nojekyll file
+        run: |
+          echo "" > out/.nojekyll
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.2.3
+        with:
+          branch: deploy
+          folder: out # The folder the action should deploy.
+
