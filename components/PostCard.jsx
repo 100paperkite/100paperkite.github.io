@@ -3,7 +3,7 @@ import Tag from '../components/Tag';
 
 const PostCard = ({ post }) => {
   return (
-    <article className="rounded-lg hover:bg-neutral-100 hover:border-neutral-200 py-2 px-4 mx-2 md:mx-4 my-3 md:my-5 ">
+    <article className="rounded-lg hover:bg-neutral-200 hover:border-neutral-200 py-2 px-4 mx-2 md:mx-4 my-3 md:my-5">
       <Link href={`/posts/${post.slug}`}>
         <a>
           <p className="text-neutral-500 text-sm md:text-base mb-1 md:mb-2 italic pl-1">

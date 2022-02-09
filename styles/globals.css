@@ -8,4 +8,5 @@
 
 body {
   word-break: keep-all;
+  @apply bg-neutral-100;
 }

@@ -26,12 +26,10 @@ export const getStaticProps = async () => {
 
 export default function Home({ posts }) {
   return (
-    <div>
-      <div className="grid grid-cols-1 max-w-screen-md mx-auto">
-        {posts.map((post, index) => (
-          <PostCard post={post} key={index} />
-        ))}
-      </div>
-    </div>
+    <>
+      {posts.map((post, index) => (
+        <PostCard post={post} key={index} />
+      ))}
+    </>
   );
 }

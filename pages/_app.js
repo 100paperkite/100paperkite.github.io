@@ -10,9 +10,11 @@ function MyApp({ Component, pageProps }) {
       <Head>
         <meta content="width=device-width, initial-scale=1" name="viewport" />
       </Head>
-      <div>
+      <div className="flex flex-col min-h-screen">
         <Navbar />
-        <Component {...pageProps} />
+        <main className="flex-grow max-w-screen-md w-full mx-auto">
+          <Component className="flex" {...pageProps} />
+        </main>
         <Footer />
       </div>
     </>
