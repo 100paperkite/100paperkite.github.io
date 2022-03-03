@@ -3,6 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 
 import { serialize } from 'next-mdx-remote/serialize';
+import Layout from '../../components/Layout';
 import PostPage from '../../components/PostPage';
 
 export const getStaticPaths = async () => {
@@ -35,7 +36,11 @@ export const getStaticProps = async ({ params: { slug } }) => {
 };
 
 const Page = ({ frontMatter, mdxSource }) => {
-  return <PostPage mdxSource={mdxSource} {...frontMatter} />;
+  return (
+    <Layout>
+      <PostPage mdxSource={mdxSource} {...frontMatter} />
+    </Layout>
+  );
 };
 
 export default Page;
