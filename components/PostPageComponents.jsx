@@ -20,6 +20,7 @@ export const PageImage = (props) => {
         alt={props.alt}
         height={props.height || 700}
         width={props.width || 700}
+        unoptimized
       />
       <div>
         <a className="text-xs underline text-neutral-500" href={props.sourceHref}>
