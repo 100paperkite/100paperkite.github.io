@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
-import PostCard from '../components/PostCard';
+import { IndexPage } from '../components/IndexPage';
 
 export const getStaticProps = async () => {
   const files = fs.readdirSync(path.join('posts'));
@@ -25,11 +25,5 @@ export const getStaticProps = async () => {
 };
 
 export default function Home({ posts }) {
-  return (
-    <>
-      {posts.map((post, index) => (
-        <PostCard post={post} key={index} />
-      ))}
-    </>
-  );
+  return <IndexPage posts={posts} />;
 }
