@@ -1,10 +1,10 @@
 import { FiGithub, FiMail } from 'react-icons/fi';
 
-import Layout from '../components/Layout';
-import PostCard from '../components/PostCard';
+import Layout from './Layout';
+import PostCard from './post/Card';
 import siteMetadata from '../data/siteMetadata';
 
-export const IndexPage = ({ posts }) => {
+const HomePage = ({ posts }) => {
   return (
     <Layout>
       <section className="border-dashed border border-neutral-300 rounded mb-8 p-4 text-sm sm:text-base">
@@ -30,3 +30,5 @@ export const IndexPage = ({ posts }) => {
     </Layout>
   );
 };
+
+export default HomePage;

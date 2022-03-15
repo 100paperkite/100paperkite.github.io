@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Tag from '../components/Tag';
+import Tag from './Tag';
 
 const PostCard = ({ post }) => {
   return (

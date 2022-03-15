@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
-import { IndexPage } from '../components/IndexPage';
+import HomePage from '../components/HomePage';
 
 export const getStaticProps = async () => {
   const files = fs.readdirSync(path.join('posts'));
@@ -25,5 +25,5 @@ export const getStaticProps = async () => {
 };
 
 export default function Home({ posts }) {
-  return <IndexPage posts={posts} />;
+  return <HomePage posts={posts} />;
 }

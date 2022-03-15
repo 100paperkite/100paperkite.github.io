@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import siteMetadata from '../data/siteMetadata';
 
-const Navbar = () => {
+const NavBar = () => {
   return (
     <nav className="flex bg-gradient-to-t from-neutral-50/0 via-neutral-50/90 to-neutral-50/100 justify-between sticky top-0 z-50 space-x-4 w-full">
       <Link href="/">
@@ -13,4 +13,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default NavBar;
