@@ -1,7 +1,7 @@
 const siteMetadata = {
-  title: `baek.jiyeon dev blog`,
+  title: 'Baek Jiyeon',
   description: `백지연의 개발 블로그입니다.`,
-  author: 'baek.jiyeon',
+  author: 'Baek Jiyeon',
   language: 'ko-kr',
   theme: 'system',
   email: '100.paperkite@gmail.com',
