@@ -16,7 +16,7 @@ const PostCard = ({ post }) => {
         )}
       </div>
 
-      <h2 className="font-title font-bold my-3 md:my-4 text-2xl md:text-3xl hover:underline">
+      <h2 className="font-title font-bold my-3 md:my-4 text-2xl md:text-3xl hover:opacity-60 hover:duration-150">
         <Link href={`/posts/${post.slug}`}>
           <a>{post.frontMatter.title}</a>
         </Link>
