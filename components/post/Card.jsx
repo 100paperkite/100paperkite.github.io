@@ -3,26 +3,29 @@ import Tag from './Tag';
 
 const PostCard = ({ post }) => {
   return (
-    <Link href={`/posts/${post.slug}`}>
-      <a>
-        <article className="my-2 p-2 px-4 transition duration-300 rounded-lg hover:bg-neutral-100">
-          <p className="text-neutral-700 text-xs md:text-sm mb-1 md:mb-1 pl-1">
-            {post.frontMatter.date}
-          </p>
-          <h3 className="text-lg md:text-xl font-bold">{post.frontMatter.title}</h3>
-          <p className="my-1 md:my-2 text-base md:text-lg text-neutral-600">
-            {post.frontMatter.description}
-          </p>
-          {post.frontMatter.tags && (
-            <div className="my-1 md:my-2 text-sm md:text-base flex">
-              {post.frontMatter.tags.map((tag, index) => (
-                <Tag name={tag} key={index} />
-              ))}
-            </div>
-          )}
-        </article>
-      </a>
-    </Link>
+    <article className="my-4 p-3 px-4 md:px-5 md:p-4 rounded-2xl md:rounded-3xl bg-neutral-100">
+      <div className="flex items-center text-sm text-neutral-500">
+        <span className="mr-1 my-auto">{post.frontMatter.date}</span>
+        {'-'}
+        {post.frontMatter.tags && (
+          <div className="flex">
+            {post.frontMatter.tags.map((tag, index) => (
+              <Tag name={tag} key={index} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <h2 className="font-title font-bold my-3 md:my-4 text-2xl md:text-3xl hover:underline">
+        <Link href={`/posts/${post.slug}`}>
+          <a>{post.frontMatter.title}</a>
+        </Link>
+      </h2>
+
+      <p className="my-1 md:my-2 text-sm md:text-base text-neutral-600">
+        {post.frontMatter.description}
+      </p>
+    </article>
   );
 };
 

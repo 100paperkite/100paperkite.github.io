@@ -6,6 +6,6 @@ export const PageSyntaxHighlighter = (props) => (
     {...props}
     style={codeStyle}
     customStyle={{ padding: '' }}
-    className="not-prose sm:not-prose md:not-prose rounded-lg text-xs md:text-sm p-3 md:p-4"
+    className="rounded-lg text-xs md:text-sm p-3 md:p-4"
   />
 );
