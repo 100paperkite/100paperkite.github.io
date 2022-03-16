@@ -1,0 +1,11 @@
+{
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": ".mdx",
+        "isAsync": true,
+        "cmd": "npm run post:update-time --filepath=${file}"
+      }
+    ]
+  }
+}
