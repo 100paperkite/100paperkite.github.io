@@ -1,5 +1,5 @@
 import { VscGithubInverted, VscMail } from 'react-icons/vsc';
-import siteMetadata from '../data/siteMetadata';
+import siteMetadata from '../siteMetadata';
 
 const Footer = () => {
   return (

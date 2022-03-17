@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import siteMetadata from '../data/siteMetadata';
+import siteMetadata from '../siteMetadata';
 
 const NavBar = () => {
   return (

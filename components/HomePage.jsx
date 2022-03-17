@@ -1,8 +1,5 @@
-import { FiGithub, FiMail } from 'react-icons/fi';
-
 import Layout from './Layout';
 import PostCard from './Post/Card';
-import siteMetadata from '../data/siteMetadata';
 
 const HomePage = ({ posts }) => {
   return (
