@@ -1,8 +1,35 @@
-const PostHead = ({ title, date, tags }) => {
+import site from '../../siteMetadata';
+import Tag from './Tag';
+
+const toLocaleDateString = (dateString) =>
+  new Date(dateString).toLocaleDateString(site.local, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+const PostHead = ({ title, created, updated, tags }) => {
+  const createdDate = toLocaleDateString(created);
+  const updatedDate = toLocaleDateString(updated);
+
   return (
-    <div className="border-b border-1 pt-2 sm:pt-4 md:pt-6 border-dashed border-neutral-400">
-      <small className="mb-1 md:mb-2 pl-1 text-neutral-500">{date}</small>
-      <h1 className="font-title">{title}</h1>
+    <div className="border-b border-1 mb-4 sm:mb-6 border-dashed border-neutral-300">
+      <div className="flex items-center	my-1 md:my-2">
+        {tags.map((tag, index) => (
+          <Tag className="mr-2" name={tag} key={index} />
+        ))}
+      </div>
+
+      <h1 className="font-title text-3xl sm:text-4xl font-extrabold my-4 sm:my-6">{title}</h1>
+      <div className="flex  py-2 md:py-3 pl-1 text-neutral-500">
+        <small className="">{createdDate}에 작성</small>
+        {createdDate !== updatedDate && (
+          <small className="">
+            {' · '}
+            {updatedDate}에 변경됨
+          </small>
+        )}
+      </div>
     </div>
   );
 };
