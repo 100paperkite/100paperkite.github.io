@@ -7,7 +7,7 @@ import HomePage from '../components/HomePage';
 export const getStaticProps = async () => {
   const files = fs.readdirSync(path.join('posts'));
 
-  const posts = files.map((filename) => {
+  let posts = files.map((filename) => {
     const markdownWithMeta = fs.readFileSync(path.join('posts', filename), 'utf-8');
     const { data: frontMatter } = matter(markdownWithMeta);
 
@@ -16,6 +16,10 @@ export const getStaticProps = async () => {
       slug: filename.split('.')[0],
     };
   });
+
+  if (process.env.NODE_ENV === 'production') {
+    posts = posts.filter(({ frontMatter: { draft } }) => draft === false);
+  }
 
   return {
     props: {

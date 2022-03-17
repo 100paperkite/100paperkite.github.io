@@ -7,7 +7,7 @@ description:
 created: '${new Date().toISOString()}'
 updated:
 tags: []
-public: false
+draft: false
 ---
 `.trim();
 
