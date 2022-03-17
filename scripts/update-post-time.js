@@ -1,5 +1,5 @@
-import fs from 'fs';
-import matter from 'gray-matter';
+const fs = require('fs');
+const matter = require('gray-matter');
 
 const filepath = process.env.npm_config_filepath;
 
@@ -18,7 +18,7 @@ const { data: frontMatter } = matter(markdown);
 
 const lines = markdown.split('\n');
 const updatedIndex = findLineIndex(frontMatter, 'updated');
-const updated = lastModifedTime(filepath);
+const updatedTime = lastModifedTime(filepath);
 
-lines.splice(updatedIndex, 1, `updated: ${updated}`);
+lines.splice(updatedIndex, 1, `updated: '${updatedTime}'`);
 fs.writeFileSync(filepath, lines.join('\n'));

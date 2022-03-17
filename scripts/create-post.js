@@ -1,10 +1,10 @@
-import fs from 'fs';
+const fs = require('fs');
 
 const frontMatter = `
 ---
-title: 
+title: Draft
 description:
-created: ${new Date().toISOString()}
+created: '${new Date().toISOString()}'
 updated:
 tags: []
 public: false
