@@ -20,7 +20,9 @@ const PostHead = ({ title, created, updated, tags }) => {
         ))}
       </div>
 
-      <h1 className="font-title text-3xl sm:text-4xl font-extrabold my-4 sm:my-6">{title}</h1>
+      <h1 className="font-title text-4xl sm:text-[44px] font-extrabold mb-2 sm:mb-4 mt-6 sm:mt-10">
+        {title}
+      </h1>
       <div className="flex  py-2 md:py-3 pl-1 text-neutral-500">
         <small className="">{createdDate}에 작성</small>
         {createdDate !== updatedDate && (

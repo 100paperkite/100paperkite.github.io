@@ -15,10 +15,9 @@ const PostCard = ({ post: { frontMatter, slug } }) => {
   return (
     <article className="my-4 p-3 px-4 md:px-5 md:p-4 rounded-2xl md:rounded-3xl bg-neutral-50">
       <div className="flex items-center text-sm text-neutral-500">
-        <span className="mr-1 my-auto">{createdDate}</span>
+        <span className="mr-2 my-auto align-middle">{createdDate}</span>
         {isTagExist && (
           <div className="flex">
-            {'-'}
             {tags.map((tag, index) => (
               <Tag name={tag} key={index} />
             ))}
