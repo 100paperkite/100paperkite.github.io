@@ -2,7 +2,10 @@ import '../styles/globals.css';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
+import { DefaultSeo } from 'next-seo';
 import * as gtag from '../lib/gtag';
+
+import site from '../siteMetadata';
 
 function App({ Component, pageProps }) {
   const router = useRouter();
@@ -35,6 +38,14 @@ function App({ Component, pageProps }) {
               page_path: window.location.pathname,
             });
           `,
+        }}
+      />
+      <DefaultSeo
+        openGraph={{
+          type: 'website',
+          locale: site.locale,
+          url: site.url,
+          site_name: site.title,
         }}
       />
       <Component {...pageProps} />

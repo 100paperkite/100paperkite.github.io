@@ -2,8 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
+import { ArticleJsonLd, NextSeo } from 'next-seo';
 import { serialize } from 'next-mdx-remote/serialize';
 import PostPage from '../../components/PostPage';
+
+import site from '../../siteMetadata';
 
 export const getStaticPaths = async () => {
   const files = fs.readdirSync(path.join('posts'));
@@ -34,6 +37,24 @@ export const getStaticProps = async ({ params: { slug } }) => {
   };
 };
 
-export default function Post({ frontMatter, mdxSource }) {
-  return <PostPage mdxSource={mdxSource} {...frontMatter} />;
+export default function Post({ frontMatter, slug, mdxSource }) {
+  return (
+    <>
+      <NextSeo
+        title={site.title}
+        titleTemplate={`%s | ${frontMatter.title}`}
+        description={frontMatter.description || frontMatter.title}
+      />
+      <ArticleJsonLd
+        type="Blog"
+        title={frontMatter.title}
+        description={frontMatter.description || frontMatter.title}
+        datePublished={frontMatter.created}
+        dateModified={frontMatter.updated}
+        authorName={site.author}
+        url={`${site.url}/posts/${slug}`}
+      ></ArticleJsonLd>
+      <PostPage mdxSource={mdxSource} {...frontMatter} />
+    </>
+  );
 }

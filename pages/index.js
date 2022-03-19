@@ -2,6 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import HomePage from '../components/HomePage';
+import { NextSeo } from 'next-seo';
+
+import site from '../siteMetadata';
 
 export const getStaticProps = async () => {
   const files = fs.readdirSync(path.join('posts'));
@@ -27,5 +30,10 @@ export const getStaticProps = async () => {
 };
 
 export default function Home({ posts }) {
-  return <HomePage posts={posts} />;
+  return (
+    <>
+      <NextSeo title={site.title} description={site.description} />
+      <HomePage posts={posts} />
+    </>
+  );
 }
