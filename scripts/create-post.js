@@ -1,15 +1,18 @@
 const fs = require('fs');
 
+const title = process.env.npm_config_title ?? 'draft';
+
+const titleToSlug = (title) => title.replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+
 const frontMatter = `
 ---
-title: Draft
+title: ${title}
 description:
 created: '${new Date().toISOString()}'
 updated:
 tags: []
-draft: false
+draft: true
 ---
 `.trim();
 
-const slug = process.env.npm_config_slug ?? 'draft';
-fs.writeFileSync(`./posts/${slug}.mdx`, frontMatter);
+fs.writeFileSync(`./posts/${titleToSlug(title)}.mdx`, frontMatter);

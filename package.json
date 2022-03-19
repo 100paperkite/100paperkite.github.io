@@ -6,8 +6,8 @@
     "build": "next build && next export",
     "start": "next start",
     "lint": "next lint",
-    "post:create": "node ./scripts/create-post.js --slug=draft",
-    "post:update-time": "node ./scripts/update-post-time.js"
+    "post:create": "node ./scripts/create-post.js --title=draft",
+    "post:update": "node ./scripts/update-post.js"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.1",

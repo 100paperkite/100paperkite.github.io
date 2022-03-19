@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-
 import HomePage from '../components/HomePage';
 
 export const getStaticProps = async () => {
@@ -10,10 +9,9 @@ export const getStaticProps = async () => {
   let posts = files.map((filename) => {
     const markdownWithMeta = fs.readFileSync(path.join('posts', filename), 'utf-8');
     const { data: frontMatter } = matter(markdownWithMeta);
-
     return {
       frontMatter,
-      slug: filename.split('.')[0],
+      slug: path.parse(filename).name,
     };
   });
 

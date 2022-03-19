@@ -4,7 +4,7 @@
       {
         "match": ".mdx",
         "isAsync": true,
-        "cmd": "npm run post:update-time --filepath=${file}"
+        "cmd": "npm run post:update --filepath='${file}'"
       }
     ]
   }
