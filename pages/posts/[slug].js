@@ -42,7 +42,7 @@ export default function Post({ frontMatter, slug, mdxSource }) {
     <>
       <NextSeo
         title={site.title}
-        titleTemplate={`%s | ${frontMatter.title}`}
+        titleTemplate={`${frontMatter.title} | %s`}
         description={frontMatter.description || frontMatter.title}
       />
       <ArticleJsonLd
