@@ -49,7 +49,7 @@ export default function Post({ frontMatter, slug, mdxSource }) {
         type="Blog"
         title={frontMatter.title}
         description={frontMatter.description || frontMatter.title}
-        datePublished={frontMatter.created}
+        datePublished={frontMatter.uploaded}
         dateModified={frontMatter.updated}
         authorName={site.author}
         url={`${site.url}/posts/${slug}`}

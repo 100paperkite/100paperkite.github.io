@@ -8,7 +8,7 @@ const frontMatter = `
 ---
 title: ${title}
 description:
-created: '${new Date().toISOString()}'
+uploaded:
 updated:
 tags: []
 draft: true

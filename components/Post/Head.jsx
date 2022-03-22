@@ -8,8 +8,8 @@ const toLocaleDateString = (dateString) =>
     day: 'numeric',
   });
 
-const PostHead = ({ title, created, updated, tags }) => {
-  const createdDate = toLocaleDateString(created);
+const PostHead = ({ title, uploaded, updated, tags }) => {
+  const uploadedDate = toLocaleDateString(uploaded);
   const updatedDate = toLocaleDateString(updated);
 
   return (
@@ -22,8 +22,8 @@ const PostHead = ({ title, created, updated, tags }) => {
 
       <h1 className="text-4xl sm:text-[44px] font-extrabold mb-2 sm:mb-4 mt-6 sm:mt-10">{title}</h1>
       <div className="flex  py-2 md:py-3 pl-1 text-neutral-500">
-        <small className="">{createdDate}에 작성</small>
-        {createdDate !== updatedDate && (
+        <small className="">{uploadedDate}에 작성</small>
+        {uploadedDate < updatedDate && (
           <small className="">
             {' · '}
             {updatedDate}에 변경됨
