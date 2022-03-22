@@ -7,9 +7,13 @@ const HomePage = ({ posts }) => {
       <section className="border-dashed border border-neutral-300 rounded mb-4 md:mb-8 p-4 text-base">
         안녕하세요 👋 백지연의 개발 블로그입니다.
       </section>
-      {posts.map((post, index) => (
-        <PostCard post={post} key={index} />
-      ))}
+      {posts
+        .sort((a, b) => {
+          return a.frontMatter.uploaded < b.frontMatter.uploaded ? 1 : -1;
+        })
+        .map((post, index) => (
+          <PostCard post={post} key={index} />
+        ))}
     </Layout>
   );
 };
