@@ -1,16 +1,36 @@
 ---
 title: 자주 잊어버리는 Git 명령어 정리
 description:
-created: '2022-03-17T16:10:50.157Z'
-updated: '2022-03-17T17:01:22.462Z'
-tags: []
-draft: true
+uploaded: '2022-03-22T14:23:27.979Z'
+updated: '2022-03-22T14:23:27.979Z'
+tags: ['git']
+draft: false
 ---
 
 ## `git rebase`
 
-## `git commit --amend`
+또는 `git rebase <basebranch> <targetbranch>`
+
+두 브랜치를 깔끔하게 합치는 명령어. merge랑은 다르게 history가 한 라인으로 깔끔하게 정리된다.
+명령어에 넘겨줄 argument가 없는 경우엔 합치고자 하는 브랜치(`experiment`)로 `checkout`한 후 합칠 브랜치(`master`)로 명령어를 실행해야 한다.
+
+<Image src="/git-two-branches.png" width="420" height="200" source="rebase 전" />
+<Image src="/git-rebase.png" width="600" height="200" source="rebase 후" />
 
 ## `git clean -fdx`
 
+untracked 파일들(한번도 커밋되지 않은 파일)을 삭제하는 명령어.
+
+`-fdx`는 옵션이며 각각
+
+- `f(force)`: 해당 옵션이 없으면 git은 파일을 삭제할 수 없다.
+- `d(recurse into directory)` : 폴더까지 다 재귀적으로 탐색해서 삭제한다
+- `x` : gitignore 같은 ignore rule도 무시하고 다 삭제한다.
+
 ## `git restore .`
+
+현재 디렉터리(`.`)의 변경점이 생긴 파일들의 변경을 없앤다. (변경점이 생긴 파일들을 마지막 커밋 상태로 돌려놓는다.)
+
+## 참고
+
+[Git-scm](https://git-scm.com/book/ko/v2/Git-%EB%B8%8C%EB%9E%9C%EC%B9%98-Rebase-%ED%95%98%EA%B8%B0)
