@@ -20,4 +20,4 @@ const PostImage = (props) => {
   );
 };
 
-export default PostImage;
+export { Image };

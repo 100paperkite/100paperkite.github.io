@@ -1,5 +1,5 @@
 import Layout from './Layout';
-import PostCard from './Post/Card';
+import { Card as PostCard } from './Post';
 
 const HomePage = ({ posts }) => {
   return (

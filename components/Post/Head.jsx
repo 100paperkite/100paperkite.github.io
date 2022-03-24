@@ -8,7 +8,7 @@ const toLocaleDateString = (dateString) =>
     day: 'numeric',
   });
 
-const PostHead = ({ title, uploaded, updated, tags }) => {
+const Head = ({ title, uploaded, updated, tags }) => {
   const uploadedDate = toLocaleDateString(uploaded);
   const updatedDate = toLocaleDateString(updated);
 
@@ -34,4 +34,4 @@ const PostHead = ({ title, uploaded, updated, tags }) => {
   );
 };
 
-export default PostHead;
+export { Head };

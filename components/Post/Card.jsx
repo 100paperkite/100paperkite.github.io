@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Tag from './Tag';
 import site from '../../siteMetadata';
 
-const PostCard = ({ post: { frontMatter, slug } }) => {
+const Card = ({ post: { frontMatter, slug } }) => {
   const { title, uploaded, description, tags } = frontMatter;
   const uploadedDate = new Date(uploaded).toLocaleDateString(site.locale, {
     year: 'numeric',
@@ -36,4 +36,4 @@ const PostCard = ({ post: { frontMatter, slug } }) => {
   );
 };
 
-export default PostCard;
+export { Card };
