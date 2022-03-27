@@ -13,4 +13,4 @@ const Callout = ({ children }) => {
   );
 };
 
-export { Callout };
+export default Callout;

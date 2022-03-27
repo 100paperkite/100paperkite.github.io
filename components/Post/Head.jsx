@@ -34,4 +34,4 @@ const Head = ({ title, uploaded, updated, tags }) => {
   );
 };
 
-export { Head };
+export default Head;

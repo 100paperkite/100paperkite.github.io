@@ -11,4 +11,4 @@ const CodeBlock = ({ children: { props } }) => {
   );
 };
 
-export { CodeBlock };
+export default CodeBlock;

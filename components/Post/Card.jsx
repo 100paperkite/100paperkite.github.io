@@ -36,4 +36,4 @@ const Card = ({ post: { frontMatter, slug } }) => {
   );
 };
 
-export { Card };
+export default Card;
