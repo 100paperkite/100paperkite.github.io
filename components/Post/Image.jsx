@@ -1,9 +1,9 @@
-import Image from 'next/image';
+import NextImage from 'next/image';
 
-const PostImage = (props) => {
+const Image = (props) => {
   return (
     <figure className="text-center pt-1 sm:pt-2 md:pt-3">
-      <Image
+      <NextImage
         className="flex rounded"
         src={props.src}
         alt={props.alt}

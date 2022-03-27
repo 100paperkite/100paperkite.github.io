@@ -5,8 +5,8 @@
 @tailwind utilities;
 
 @layer base {
-  h1,
-  h2 {
+  * {
+    box-sizing: border-box;
     word-break: keep-all;
   }
   nav {
@@ -27,11 +27,15 @@
   }
 
   .prose pre {
-    @apply px-3 text-sm md:text-base !important;
+    @apply text-sm sm:text-base p-3 md:p-4 !important;
   }
 
-  .prose :is(h2, h3, h4, h5) {
+  .prose :is(h1, h2, h3, h4, h5) {
     @apply border-b mb-3 sm:mb-5 pb-2 border-neutral-200;
+  }
+
+  .prose h1 {
+    @apply text-3xl mt-10 sm:mt-14;
   }
 
   .prose a:hover {
