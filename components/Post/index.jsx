@@ -1,5 +1,6 @@
-export { Head } from './Head';
-export { Card } from './Card';
-export { CodeBlock } from './CodeBlock';
-export { Image } from './Image';
-export { Callout } from './Callout';
+export { default as Head } from './Head';
+export { default as Card } from './Card';
+export { default as CodeBlock } from './CodeBlock';
+export { default as Image } from './Image';
+export { default as Callout } from './Callout';
+export { default as Utterances } from './Utterances';
