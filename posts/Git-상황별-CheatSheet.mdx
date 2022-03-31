@@ -1,0 +1,178 @@
+---
+title: Git 상황별 CheatSheet
+description: 자주 당면하는 Git 문제들의 해결방법을 잊지 않도록 적어둡니다.
+uploaded: '2022-03-31T12:44:49.015Z'
+updated: '2022-03-31T12:44:49.015Z'
+tags: ['git']
+draft: false
+---
+
+# 🛠️ 커밋 수정하기
+
+## 마지막 커밋 메시지 수정하기
+
+```bash
+git commit --amend # 마지막 커밋 메시지 수정하기
+git commit --amend -m "수정할 메시지" # 이렇게 바로 수정도 가능
+```
+
+## 커밋 수정하기
+
+```bash
+git rebase -i <이 커밋 이후를 수정>
+
+
+# 위 명령어를 시행하면 아래와 같은 에디터가 뜬다. (rebase를 -i(interactive)모드로 실행했기 때문)
+# 해당 커밋부터 최신 커밋까지 아래에 지정한 커맨드로 rebase한다.
+
+# 여기서 수정하고 싶은 커밋을 `pick` 커맨드 대신 `edit`으로 바꾸면, rebase중에 잠깐 정지되고,
+# 이 때 커밋 내용을 수정할 수 있다.
+----------------------------------
+pick deadbee 커밋 메시지
+edit fa1afe1 커밋 메시지
+...
+
+```
+
+# 🚫 커밋 취소/삭제하기
+
+## 1. 혼자 쓰는 브랜치에서 커밋 취소하기 - `git reset`
+
+```bash
+git reset b5f654d # b5f654d 커밋으로 되돌리기
+git reset HEAD~N # N개 커밋 이전으로 되돌리기. N은 커밋 개수
+
+git reset --soft HEAD~1 # 마지막 커밋을 staged 상태로 돌려놓는다.
+git reset HEAD~1 # 마지막 커밋을 staged되기 전 상태로 돌려놓는다.
+git reset --hard HEAD~1 # 마지막 커밋 내용을 삭제. 해당 명령어 완료 후 working tree는 clean하다.
+```
+
+이미 원격 저장소에 올라간 커밋을 `git reset --hard`로 커밋을 삭제한 후 push하면, 원격 저장소의 커밋 히스토리엔 삭제된 커밋이 남아있기 때문에 충돌이 발생.
+
+혼자 사용하는 브랜치라면 `git push -f`로 아예 브랜치를 덮어 쓰면 문제가 없겠지만, 공동으로 사용하는 브랜치라면 `git push -f`를 사용하기 힘드므로 `git revert`로 커밋을 삭제할 것.
+
+## 2. 공용(원격 저장소) 브랜치에서 커밋 취소하기 - `git revert`
+
+`git revert`은 `git reset`처럼 커밋 히스토리를 삭제하지 않고, 이전 커밋 내역을 남겨둔 채 새로운 커밋을 생성하므로 커밋 히스토리의 충돌을 걱정할 필요가 없다.
+
+```
+A---B---C---C' <- 삭제된 커밋
+        ^
+        |
+     삭제할 커밋
+```
+
+```bash
+git revert [커밋 SHA, HEAD 등등]
+
+# 해당 명령을 실행하면 revert를 위한 커밋을 생성하게 되고, 커밋을 생성하면 취소가 완료된다.
+
+```
+
+## 3. 브랜치에서 중간의 N개 커밋 삭제하기
+
+```
+E---F---G---H---I---J  <-- (main/HEAD)
+```
+
+```
+E---H---I---J  <-- (main/HEAD)
+```
+
+### 해결 방법
+
+```bash
+git rebase -i F
+
+# 위 명령어 이후 아래와 같은 에디터 창이 뜨면 지울 G, H 커밋을 `pick`대신 `drop`으로 변경한 후 저장한다.
+----------------------------------
+pick deadbee F commit
+drop fa1afe1 G commit
+drop df02f3w H commit
+pick q29d1fd I commit
+...
+```
+
+```bash
+# git rebase --onto [새로운 base] [무시할 base] [새로운 base에 붙일 branch]
+git rebase --onto E G main # E 커밋을 베이스로 하며 G커밋은 무시하고, main 브랜치를 붙인다.
+git rebase --onto main~5 main~3 main # 또는 이렇게도 가능
+```
+
+# 〽 브랜치의 base를 변경하기
+
+## 1. 부모 브랜치가 아니라 다른 브랜치를 base로 하고 싶은 경우
+
+ex. feature2는 feature1에서 나온 브랜치지만, main에 feature1 커밋을 제외하고 main에 바로 넣고자 할 때
+
+```
+---A---B---C <= (main)
+     \
+      E---F---F---H <= (feature1)
+                    \
+                     J---K---L---M <= (feature2)
+
+```
+
+```
+---A---B---C <= (main)
+   | \
+   |  E---F---F---H <= (feature1)
+   |
+   J---K---L---M <= (feature2)
+
+```
+
+## 2. 부모 브랜치의 이전 커밋으로 브랜치의 base를 변경하고 싶은 경우
+
+ex. main에서 브랜치를 파서 작업을 하던 도중, main에 올라간 최신 커밋들에 문제를 발견하여 문제가 없는 커밋으로 옮기고자 할 때
+
+```
+---A---B---C---D <= (main)
+            \
+             E---F---F---H <= (feature)
+
+```
+
+```
+---A---B---C---D <= (main)
+    \
+     E---F---F---H <= (feature)
+```
+
+## 해결 방법 - `git rebase --onto`
+
+```bash
+# 새로운 base에 기존 base branch 내용은 제외하고 새로운 base branch 커밋을 붙인다.
+git rebase --onto [새로운 base branch 또는 commit id] [기존 base branch] [새로운 base에 붙일 branch]
+```
+
+```bash
+# 1번 예시의 경우
+git rebase --onto main feature1 feature2
+
+# 2번 예시의 경우
+git rebase --onto A main feature
+```
+
+# 🪓 브랜치 분할하기
+
+```
+---A---B---D---E---F---G   <-- (main)
+
+```
+
+```
+---A---B---D <-- (main)
+            \
+             E---F---G (new branch)
+```
+
+## 해결 방법
+
+```bash
+git branch newbranch # 새 브랜치 생성
+git checkout main # 메인으로 HEAD 이동
+git reset --hard HEAD~3 # HEAD에서 가장 최신 3개의 커밋을 제거
+git checkout newbranch # 새 브랜치로 이동
+```
