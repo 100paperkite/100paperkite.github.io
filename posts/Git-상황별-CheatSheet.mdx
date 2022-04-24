@@ -7,16 +7,16 @@ tags: ['git']
 draft: false
 ---
 
-# 🛠️ 커밋 수정하기
+## 🛠️ 커밋 수정하기
 
-## 마지막 커밋 메시지 수정하기
+### 마지막 커밋 메시지 수정하기
 
 ```bash
 git commit --amend # 마지막 커밋 메시지 수정하기
 git commit --amend -m "수정할 메시지" # 이렇게 바로 수정도 가능
 ```
 
-## 커밋 수정하기
+### 커밋 수정하기
 
 ```bash
 git rebase -i <이 커밋 이후를 수정>
@@ -34,9 +34,9 @@ edit fa1afe1 커밋 메시지
 
 ```
 
-# 🚫 커밋 취소/삭제하기
+## 🚫 커밋 취소/삭제하기
 
-## 1. 혼자 쓰는 브랜치에서 커밋 취소하기 - `git reset`
+### 1. 혼자 쓰는 브랜치에서 커밋 취소하기 - `git reset`
 
 ```bash
 git reset b5f654d # b5f654d 커밋으로 되돌리기
@@ -51,7 +51,7 @@ git reset --hard HEAD~1 # 마지막 커밋 내용을 삭제. 해당 명령어 �
 
 혼자 사용하는 브랜치라면 `git push -f`로 아예 브랜치를 덮어 쓰면 문제가 없겠지만, 공동으로 사용하는 브랜치라면 `git push -f`를 사용하기 힘드므로 `git revert`로 커밋을 삭제할 것.
 
-## 2. 공용(원격 저장소) 브랜치에서 커밋 취소하기 - `git revert`
+### 2. 공용(원격 저장소) 브랜치에서 커밋 취소하기 - `git revert`
 
 `git revert`은 `git reset`처럼 커밋 히스토리를 삭제하지 않고, 이전 커밋 내역을 남겨둔 채 새로운 커밋을 생성하므로 커밋 히스토리의 충돌을 걱정할 필요가 없다.
 
@@ -69,7 +69,7 @@ git revert [커밋 SHA, HEAD 등등]
 
 ```
 
-## 3. 브랜치에서 중간의 N개 커밋 삭제하기
+### 3. 브랜치에서 중간의 N개 커밋 삭제하기
 
 ```
 E---F---G---H---I---J  <-- (main/HEAD)
@@ -79,7 +79,7 @@ E---F---G---H---I---J  <-- (main/HEAD)
 E---H---I---J  <-- (main/HEAD)
 ```
 
-### 해결 방법
+#### 해결 방법
 
 ```bash
 git rebase -i F
@@ -99,9 +99,9 @@ git rebase --onto E G main # E 커밋을 베이스로 하며 G커밋은 무시�
 git rebase --onto main~5 main~3 main # 또는 이렇게도 가능
 ```
 
-# 〽 브랜치의 base를 변경하기
+## 〽 브랜치의 base를 변경하기
 
-## 1. 부모 브랜치가 아니라 다른 브랜치를 base로 하고 싶은 경우
+### 1. 부모 브랜치가 아니라 다른 브랜치를 base로 하고 싶은 경우
 
 ex. feature2는 feature1에서 나온 브랜치지만, main에 feature1 커밋을 제외하고 main에 바로 넣고자 할 때
 
@@ -123,7 +123,7 @@ ex. feature2는 feature1에서 나온 브랜치지만, main에 feature1 커밋�
 
 ```
 
-## 2. 부모 브랜치의 이전 커밋으로 브랜치의 base를 변경하고 싶은 경우
+### 2. 부모 브랜치의 이전 커밋으로 브랜치의 base를 변경하고 싶은 경우
 
 ex. main에서 브랜치를 파서 작업을 하던 도중, main에 올라간 최신 커밋들에 문제를 발견하여 문제가 없는 커밋으로 옮기고자 할 때
 
@@ -140,7 +140,7 @@ ex. main에서 브랜치를 파서 작업을 하던 도중, main에 올라간 �
      E---F---F---H <= (feature)
 ```
 
-## 해결 방법 - `git rebase --onto`
+### 해결 방법 - `git rebase --onto`
 
 ```bash
 # 새로운 base에 기존 base branch 내용은 제외하고 새로운 base branch 커밋을 붙인다.
@@ -155,7 +155,7 @@ git rebase --onto main feature1 feature2
 git rebase --onto A main feature
 ```
 
-# 🪓 브랜치 분할하기
+## 🪓 브랜치 분할하기
 
 ```
 ---A---B---D---E---F---G   <-- (main)
@@ -168,7 +168,7 @@ git rebase --onto A main feature
              E---F---G (new branch)
 ```
 
-## 해결 방법
+### 해결 방법
 
 ```bash
 git branch newbranch # 새 브랜치 생성
