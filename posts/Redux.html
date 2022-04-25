@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="ko-KR"><head><meta name="viewport" content="width=device-width"/><meta charSet="utf-8"/><meta property="og:url" content="https://100paperkite.github.io"/><meta property="og:type" content="website"/><meta property="og:locale" content="ko-KR"/><meta property="og:site_name" content="Baek Jiyeon"/><title>Redux | Baek Jiyeon</title><meta name="robots" content="index,follow"/><meta name="description" content="Redux"/><meta property="og:title" content="Redux | Baek Jiyeon"/><meta property="og:description" content="Redux"/><script type="application/ld+json">{"@context":"https://schema.org","@type":"Blog","datePublished":"2022-04-25T14:07:00.131Z","description":"Redux","mainEntityOfPage":{"@type":"WebPage","@id":"https://100paperkite.github.io/posts/Redux"},"headline":"Redux","dateModified":"2022-04-25T14:07:00.131Z","author":{"@type":"Person","name":"Baek Jiyeon"}}</script><meta name="next-head-count" content="12"/><script id="gtag-init" strategy="afterInteractive">
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-FFSLQ27YMJ', {
+                page_path: window.location.pathname,
+              });
+            </script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-FFSLQ27YMJ"></script><link rel="preload" href="/_next/static/css/a1248b712b212e8b.css" as="style"/><link rel="stylesheet" href="/_next/static/css/a1248b712b212e8b.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" nomodule="" src="/_next/static/chunks/polyfills-5cd94c89d3acac5f.js"></script><script src="/_next/static/chunks/webpack-5229e4176ced45f0.js" defer=""></script><script src="/_next/static/chunks/framework-a070cbfff3c750c5.js" defer=""></script><script src="/_next/static/chunks/main-1b1db7be3343898e.js" defer=""></script><script src="/_next/static/chunks/pages/_app-4950b4b931360bc8.js" defer=""></script><script src="/_next/static/chunks/0c428ae2-aee1a03cbb0f41ac.js" defer=""></script><script src="/_next/static/chunks/17007de1-711cf284c97b49d4.js" defer=""></script><script src="/_next/static/chunks/2596-e9cc441945f84dbb.js" defer=""></script><script src="/_next/static/chunks/pages/posts/%5Bslug%5D-31ac287c4ff03009.js" defer=""></script><script src="/_next/static/VbkfKbbXa8uv_nNHCiPVO/_buildManifest.js" defer=""></script><script src="/_next/static/VbkfKbbXa8uv_nNHCiPVO/_ssgManifest.js" defer=""></script><script src="/_next/static/VbkfKbbXa8uv_nNHCiPVO/_middlewareManifest.js" defer=""></script></head><body><div id="__next" data-reactroot=""><div class="flex flex-col min-h-screen"><nav class="flex justify-between sticky top-0 z-50 space-x-4 py-2"><a class="text-neutral-800 hover:text-neutral-600 md:text-xl font-bold mx-4 md:mx-6 my-1 md:my-2 p-2 " href="/">Baek Jiyeon</a></nav><main class="max-w-[820px] px-4 w-full mx-auto flex-grow font-body"><div class="px-2 md:px-4 py-2 md:py-4"><div class="border-b border-1 mb-4 sm:mb-6 border-dashed border-neutral-300"><div class="flex items-center my-1 md:my-2 gap-x-2"><div class="text-[10px] md:text-xs rounded-full bg-neutral-200 text-neutral-500 font-semibold px-2.5 md:px-3.5 md:py-1">react</div><div class="text-[10px] md:text-xs rounded-full bg-neutral-200 text-neutral-500 font-semibold px-2.5 md:px-3.5 md:py-1">frontend</div><div class="text-[10px] md:text-xs rounded-full bg-neutral-200 text-neutral-500 font-semibold px-2.5 md:px-3.5 md:py-1">redux</div></div><h1 class="text-4xl sm:text-[44px] font-extrabold mb-2 sm:mb-4 mt-6 sm:mt-10">Redux</h1><div class="flex py-2 md:py-3 pl-1 text-neutral-500"><small class="">April 25, 2022<!-- -->에 작성</small></div></div><article class="max-w-none prose prose-neutral prose-sm sm:prose-base md:prose-md"><p><code>컴포넌트 간의 상태(cross-component)</code> 또는 <code>앱 전반에 걸친 상태(app-wide)</code>를 위한 third party 상태 관리 시스템.</p>
+<h2>React Context의 단점</h2>
+<h3>1. 관리의 어려움</h3>
+<p>대규모 어플리케이션에선 React Context를 사용하면 마치 js의 콜백 지옥 처럼 아래와 같이 관리가 복잡해진다. 그렇다고 하나의 Context만 쓴다면 해당 컴포넌트에서 모든 상태를 관리하게 되므로 Context 컴포넌트가 무거워지고 또 관리가 어렵다.</p>
+<pre style="display:block;overflow-x:auto;padding:0.5em;color:#333;background:#f8f8f8"><code class="language-text">return (
+  &lt;AAAContextProvider&gt;
+    &lt;BBBContextProvider&gt;
+      &lt;CCCContextProvider&gt;{/* 점점 깊어진다 */}&lt;/CCCContextProvider&gt;
+    &lt;/BBBContextProvider&gt;
+  &lt;/AAAContextProvider&gt;
+);</code></pre>
+<h3>2. 성능의 한계</h3>
+<p>리액트 개발자의 <a href="https://github.com/facebook/react/issues/14110#issuecomment-448074060">GitHub 코멘트</a>를 보면, 애초에 Context API는 자주 변경되는 상태 관리에 적합하지 않다고 한다.</p>
+<h2>Redux 동작 방식</h2>
+<ul>
+<li>중앙 데이터 저장소를 가진다. (어플리케이션 당 단 하나의 저장소만 존재한다.)</li>
+<li><a href="https://ko.wikipedia.org/wiki/%EB%B0%9C%ED%96%89-%EA%B5%AC%EB%8F%85_%EB%AA%A8%EB%8D%B8">발행-구독 모델</a>을 따른다.<!-- -->
+<ul>
+<li>컴포넌트가 저장소를 구독한다.</li>
+<li>상태를 변경하기 위한 action 을 dispatch 하면 reducer 함수가 실행되고, action에 따라 저장소의 상태를 변경한다.</li>
+<li>상태가 변경되면 저장소는 구독중인 컴포넌트에 최신 상태를 전달한다.</li>
+</ul>
+</li>
+</ul>
+<h2>코드 예시</h2>
+<pre style="display:block;overflow-x:auto;padding:0.5em;color:#333;background:#f8f8f8"><code class="language-javascript">const INCREMENT = &#x27;INCREMENT&#x27;;
+const DECREMENT = &#x27;DECREMENT&#x27;;
+
+
+import { createStore } from &#x27;redux&#x27;;
+
+// 상태를 관리하는 함수
+const counterReducer = (state = { count: 0 }, action) =&gt; {
+    if (action.type === INCREMENT) {
+        return {
+            count: state + action.amount;
+        };
+    }
+    else if (action.type == DECREMENT) {
+        return {
+            count: state - action.amount;
+        };
+    }
+    return state;
+}
+
+// 상태 저장소 생성
+const store = createStore(counterReducer);
+
+// 현재 상태를 출력하는 구독 함수
+const counterSubscriber = () =&gt; {
+    console.log(store.getState());
+}
+
+// 저장소가 해당 함수를 구독한다. (상태가 변경되면 해당 함수가 실행된다.)
+store.subscribe(counterSubscriber);
+
+// 상태를 변경. counterSubscriber가 실행되고 { count: 1 } 가 출력된다.
+store.dispatch({ type: INCREMENT, amount: 1});
+
+// 상태를 변경. counterSubscriber가 실행되고 { count: 0 } 가 출력된다.
+store.dispatch({ type: DECREMENT, amount: 1});</code></pre>
+<h3>React에서 redux 사용하기</h3>
+<pre style="display:block;overflow-x:auto;padding:0.5em;color:#333;background:#f8f8f8"><code class="language-javascript">// store.js
+
+// 이전 코드는 생략...
+store = createStore(counterReducer);
+
+export default store;</code></pre>
+<pre style="display:block;overflow-x:auto;padding:0.5em;color:#333;background:#f8f8f8"><code class="language-text">// App.jsx
+import { Provider } from &#x27;react-redux&#x27;;
+import Counter from &#x27;./components/Counter&#x27;;
+
+const App = () =&gt; {
+  return (
+    &lt;Provider store={store}&gt;
+      &lt;Counter /&gt;
+    &lt;/Provider&gt;
+  );
+};
+
+// Counter.jsx
+import { INCREMENT, DECREMENT } from &#x27;./store&#x27;;
+import { useSelector, useDispatch } from &#x27;react-redux&#x27;;
+
+const Counter = () =&gt; {
+  const dispatch = useDispatch();
+  // 상태의 일부를 반환. useSelector hook이 해당 컴포넌트를 자동으로 구독하므로 상태가 변경되면 자동으로 반영된다.
+  const count = useSelector((state) =&gt; state.count);
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{count}&lt;/h1&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: INCREMENT, amount: 1 })}&gt;+&lt;/button&gt;
+      &lt;button onClick={() =&gt; dispatch({ type: DECREMENT, amount: 1 })}&gt;-&lt;/button&gt;
+    &lt;/div&gt;
+  );
+};</code></pre>
+<h2>Redux toolkit</h2>
+<p>redux를 좀 더 쉽게 사용하기 위한 툴킷.</p>
+<pre style="display:block;overflow-x:auto;padding:0.5em;color:#333;background:#f8f8f8"><code class="language-javascript">// store.js
+const { createStore } from &#x27;redux&#x27;;
+const { createSlice, configureStore } from &#x27;@reduxjs/toolkit&#x27;;
+
+const initialState = {
+  count: 0,
+};
+
+const counterSlice = createSlice({
+    name: &#x27;counter&#x27;,
+    initialState, // 초기 값
+    reducers: {
+        // 여기에 action에 따라 동작할 함수를 정의한다.
+        increment(state, action) {
+            /**
+             *  action에는 redux-toolkit이 자동으로 생성한 action 객체가 전달된다.
+             *  { type: &#x27;redux toolkit이 생성한 고유한 ID 값&#x27;, payload: ... }
+             */
+
+            // 기존과 달리 상태 객체의 상태를 직접 참조해서 변경해도 문제가 없다. 내부에서 따로 상태를 복제해서 사용.
+            state.count = state.count + action.payload;
+        }
+        decrement(state, action) {
+            state.count = state.count - action.payload;
+        }
+    }
+})
+
+const store = configureStore({
+    reducer: {
+        counter: counterSlice.reducer, // reducer map을 만듦
+        // 여기에도 다른 슬라이스를 추가할 수 있다.
+    }
+});
+
+export const counterActions = counterSlice.actions;
+
+
+// Counter.jsx
+import { useSelector, useDispatch } from &#x27;react-redux&#x27;;
+import { counterActions } from &#x27;./store&#x27;;
+
+const Counter = () =&gt; {
+  const dispatch = useDispatch();
+  const count = useSelector((state) =&gt; state.counter.count);
+
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{count}&lt;/h1&gt;
+      &lt;button onClick={() =&gt; dispatch(counterActions.increment(1))}&gt;+&lt;/button&gt;
+      &lt;button onClick={() =&gt; dispatch(counterActions.decrement(1))}&gt;-&lt;/button&gt;
+    &lt;/div&gt;
+  );
+};</code></pre></article><div><hr class="border-t border-neutral-300 my-8 sm:my-16"/><section></section></div></div></main><footer class="font-title py-4 sm:py-8 flex flex-col items-center text-neutral-600"><div class="flex flex-row my-2"><div class="flex items-center py-1"><a class="m-2 " href="https://github.com/100paperkite"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" class="w-7 h-7" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.976 0A7.977 7.977 0 0 0 0 7.976c0 3.522 2.3 6.507 5.431 7.584.392.049.538-.196.538-.392v-1.37c-2.201.49-2.69-1.076-2.69-1.076-.343-.93-.881-1.175-.881-1.175-.734-.489.048-.489.048-.489.783.049 1.224.832 1.224.832.734 1.223 1.859.88 2.3.685.048-.538.293-.88.489-1.076-1.762-.196-3.621-.881-3.621-3.964 0-.88.293-1.566.832-2.153-.05-.147-.343-.978.098-2.055 0 0 .685-.196 2.201.832.636-.196 1.322-.245 2.007-.245s1.37.098 2.006.245c1.517-1.027 2.202-.832 2.202-.832.44 1.077.146 1.908.097 2.104a3.16 3.16 0 0 1 .832 2.153c0 3.083-1.86 3.719-3.62 3.915.293.244.538.733.538 1.467v2.202c0 .196.146.44.538.392A7.984 7.984 0 0 0 16 7.976C15.951 3.572 12.38 0 7.976 0z"></path></svg></a><a class="m-2" href="mailto:100.paperkite@gmail.com"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" class="w-7 h-7" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M1 3.5l.5-.5h13l.5.5v9l-.5.5h-13l-.5-.5v-9zm1 1.035V12h12V4.536L8.31 8.9H7.7L2 4.535zM13.03 4H2.97L8 7.869 13.03 4z"></path></svg></a></div></div><span class="text-sm md:text-base text-neutral-500">Baek Jiyeon<!-- --> © <!-- -->2022</span></footer></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"frontMatter":{"title":"Redux","description":null,"uploaded":"2022-04-25T14:07:00.131Z","updated":"2022-04-25T14:07:00.131Z","tags":["react","frontend","redux"],"draft":false},"slug":"Redux","mdxSource":{"compiledSource":"/*@jsxRuntime automatic @jsxImportSource react*/\nconst {Fragment: _Fragment, jsx: _jsx, jsxs: _jsxs} = arguments[0];\nconst {useMDXComponents: _provideComponents} = arguments[0];\nfunction MDXContent(props = {}) {\n  const {wrapper: MDXLayout} = Object.assign({}, _provideComponents(), props.components);\n  return MDXLayout ? _jsx(MDXLayout, Object.assign({}, props, {\n    children: _jsx(_createMdxContent, {})\n  })) : _createMdxContent();\n  function _createMdxContent() {\n    const _components = Object.assign({\n      p: \"p\",\n      code: \"code\",\n      h2: \"h2\",\n      h3: \"h3\",\n      pre: \"pre\",\n      a: \"a\",\n      ul: \"ul\",\n      li: \"li\"\n    }, _provideComponents(), props.components);\n    return _jsxs(_Fragment, {\n      children: [_jsxs(_components.p, {\n        children: [_jsx(_components.code, {\n          children: \"컴포넌트 간의 상태(cross-component)\"\n        }), \" 또는 \", _jsx(_components.code, {\n          children: \"앱 전반에 걸친 상태(app-wide)\"\n        }), \"를 위한 third party 상태 관리 시스템.\"]\n      }), \"\\n\", _jsx(_components.h2, {\n        children: \"React Context의 단점\"\n      }), \"\\n\", _jsx(_components.h3, {\n        children: \"1. 관리의 어려움\"\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"대규모 어플리케이션에선 React Context를 사용하면 마치 js의 콜백 지옥 처럼 아래와 같이 관리가 복잡해진다. 그렇다고 하나의 Context만 쓴다면 해당 컴포넌트에서 모든 상태를 관리하게 되므로 Context 컴포넌트가 무거워지고 또 관리가 어렵다.\"\n      }), \"\\n\", _jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          className: \"language-jsx\",\n          children: \"return (\\n  \u003cAAAContextProvider\u003e\\n    \u003cBBBContextProvider\u003e\\n      \u003cCCCContextProvider\u003e{/* 점점 깊어진다 */}\u003c/CCCContextProvider\u003e\\n    \u003c/BBBContextProvider\u003e\\n  \u003c/AAAContextProvider\u003e\\n);\\n\"\n        })\n      }), \"\\n\", _jsx(_components.h3, {\n        children: \"2. 성능의 한계\"\n      }), \"\\n\", _jsxs(_components.p, {\n        children: [\"리액트 개발자의 \", _jsx(_components.a, {\n          href: \"https://github.com/facebook/react/issues/14110#issuecomment-448074060\",\n          children: \"GitHub 코멘트\"\n        }), \"를 보면, 애초에 Context API는 자주 변경되는 상태 관리에 적합하지 않다고 한다.\"]\n      }), \"\\n\", _jsx(_components.h2, {\n        children: \"Redux 동작 방식\"\n      }), \"\\n\", _jsxs(_components.ul, {\n        children: [\"\\n\", _jsx(_components.li, {\n          children: \"중앙 데이터 저장소를 가진다. (어플리케이션 당 단 하나의 저장소만 존재한다.)\"\n        }), \"\\n\", _jsxs(_components.li, {\n          children: [_jsx(_components.a, {\n            href: \"https://ko.wikipedia.org/wiki/%EB%B0%9C%ED%96%89-%EA%B5%AC%EB%8F%85_%EB%AA%A8%EB%8D%B8\",\n            children: \"발행-구독 모델\"\n          }), \"을 따른다.\", \"\\n\", _jsxs(_components.ul, {\n            children: [\"\\n\", _jsx(_components.li, {\n              children: \"컴포넌트가 저장소를 구독한다.\"\n            }), \"\\n\", _jsx(_components.li, {\n              children: \"상태를 변경하기 위한 action 을 dispatch 하면 reducer 함수가 실행되고, action에 따라 저장소의 상태를 변경한다.\"\n            }), \"\\n\", _jsx(_components.li, {\n              children: \"상태가 변경되면 저장소는 구독중인 컴포넌트에 최신 상태를 전달한다.\"\n            }), \"\\n\"]\n          }), \"\\n\"]\n        }), \"\\n\"]\n      }), \"\\n\", _jsx(_components.h2, {\n        children: \"코드 예시\"\n      }), \"\\n\", _jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          className: \"language-javascript\",\n          children: \"\\nconst INCREMENT = 'INCREMENT';\\nconst DECREMENT = 'DECREMENT';\\n\\n\\nimport { createStore } from 'redux';\\n\\n// 상태를 관리하는 함수\\nconst counterReducer = (state = { count: 0 }, action) =\u003e {\\n    if (action.type === INCREMENT) {\\n        return {\\n            count: state + action.amount;\\n        };\\n    }\\n    else if (action.type == DECREMENT) {\\n        return {\\n            count: state - action.amount;\\n        };\\n    }\\n    return state;\\n}\\n\\n// 상태 저장소 생성\\nconst store = createStore(counterReducer);\\n\\n// 현재 상태를 출력하는 구독 함수\\nconst counterSubscriber = () =\u003e {\\n    console.log(store.getState());\\n}\\n\\n// 저장소가 해당 함수를 구독한다. (상태가 변경되면 해당 함수가 실행된다.)\\nstore.subscribe(counterSubscriber);\\n\\n// 상태를 변경. counterSubscriber가 실행되고 { count: 1 } 가 출력된다.\\nstore.dispatch({ type: INCREMENT, amount: 1});\\n\\n// 상태를 변경. counterSubscriber가 실행되고 { count: 0 } 가 출력된다.\\nstore.dispatch({ type: DECREMENT, amount: 1});\\n\\n\"\n        })\n      }), \"\\n\", _jsx(_components.h3, {\n        children: \"React에서 redux 사용하기\"\n      }), \"\\n\", _jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          className: \"language-javascript\",\n          children: \"// store.js\\n\\n// 이전 코드는 생략...\\nstore = createStore(counterReducer);\\n\\nexport default store;\\n\"\n        })\n      }), \"\\n\", _jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          className: \"language-JSX\",\n          children: \"// App.jsx\\nimport { Provider } from 'react-redux';\\nimport Counter from './components/Counter';\\n\\nconst App = () =\u003e {\\n  return (\\n    \u003cProvider store={store}\u003e\\n      \u003cCounter /\u003e\\n    \u003c/Provider\u003e\\n  );\\n};\\n\\n// Counter.jsx\\nimport { INCREMENT, DECREMENT } from './store';\\nimport { useSelector, useDispatch } from 'react-redux';\\n\\nconst Counter = () =\u003e {\\n  const dispatch = useDispatch();\\n  // 상태의 일부를 반환. useSelector hook이 해당 컴포넌트를 자동으로 구독하므로 상태가 변경되면 자동으로 반영된다.\\n  const count = useSelector((state) =\u003e state.count);\\n\\n  return (\\n    \u003cdiv\u003e\\n      \u003ch1\u003e{count}\u003c/h1\u003e\\n      \u003cbutton onClick={() =\u003e dispatch({ type: INCREMENT, amount: 1 })}\u003e+\u003c/button\u003e\\n      \u003cbutton onClick={() =\u003e dispatch({ type: DECREMENT, amount: 1 })}\u003e-\u003c/button\u003e\\n    \u003c/div\u003e\\n  );\\n};\\n\"\n        })\n      }), \"\\n\", _jsx(_components.h2, {\n        children: \"Redux toolkit\"\n      }), \"\\n\", _jsx(_components.p, {\n        children: \"redux를 좀 더 쉽게 사용하기 위한 툴킷.\"\n      }), \"\\n\", _jsx(_components.pre, {\n        children: _jsx(_components.code, {\n          className: \"language-javascript\",\n          children: \"// store.js\\nconst { createStore } from 'redux';\\nconst { createSlice, configureStore } from '@reduxjs/toolkit';\\n\\nconst initialState = {\\n  count: 0,\\n};\\n\\nconst counterSlice = createSlice({\\n    name: 'counter',\\n    initialState, // 초기 값\\n    reducers: {\\n        // 여기에 action에 따라 동작할 함수를 정의한다.\\n        increment(state, action) {\\n            /**\\n             *  action에는 redux-toolkit이 자동으로 생성한 action 객체가 전달된다.\\n             *  { type: 'redux toolkit이 생성한 고유한 ID 값', payload: ... }\\n             */\\n\\n            // 기존과 달리 상태 객체의 상태를 직접 참조해서 변경해도 문제가 없다. 내부에서 따로 상태를 복제해서 사용.\\n            state.count = state.count + action.payload;\\n        }\\n        decrement(state, action) {\\n            state.count = state.count - action.payload;\\n        }\\n    }\\n})\\n\\nconst store = configureStore({\\n    reducer: {\\n        counter: counterSlice.reducer, // reducer map을 만듦\\n        // 여기에도 다른 슬라이스를 추가할 수 있다.\\n    }\\n});\\n\\nexport const counterActions = counterSlice.actions;\\n\\n\\n// Counter.jsx\\nimport { useSelector, useDispatch } from 'react-redux';\\nimport { counterActions } from './store';\\n\\nconst Counter = () =\u003e {\\n  const dispatch = useDispatch();\\n  const count = useSelector((state) =\u003e state.counter.count);\\n\\n  return (\\n    \u003cdiv\u003e\\n      \u003ch1\u003e{count}\u003c/h1\u003e\\n      \u003cbutton onClick={() =\u003e dispatch(counterActions.increment(1))}\u003e+\u003c/button\u003e\\n      \u003cbutton onClick={() =\u003e dispatch(counterActions.decrement(1))}\u003e-\u003c/button\u003e\\n    \u003c/div\u003e\\n  );\\n};\\n\\n\\n\"\n        })\n      })]\n    });\n  }\n}\nreturn {\n  default: MDXContent\n};\n","frontmatter":{},"scope":{}}},"__N_SSG":true},"page":"/posts/[slug]","query":{"slug":"Redux"},"buildId":"VbkfKbbXa8uv_nNHCiPVO","isFallback":false,"gsp":true,"scriptLoader":[]}</script></body></html>
