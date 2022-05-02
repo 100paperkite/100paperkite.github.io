@@ -1,0 +1,69 @@
+---
+title: Machine code vs. Byte code vs. Object code vs. Assembly code
+description: 컴파일러와 인터프리터가 생성하거나 사용하는 code 용어들을 정리.
+uploaded: '2022-05-02T13:35:08.723Z'
+updated: '2022-05-02T13:35:08.723Z'
+tags: []
+draft: false
+---
+
+컴파일러와 인터프리터에 대해 알아보다 보면 중간 과정에서 무수히 많은 `code`들이 등장하는데.. 이걸 정리해보았다.
+
+<Image
+  src="/code-diagram.png"
+  alt="diagram of codes"
+  width="800"
+  height="600"
+  sourceHref="https://stackoverflow.com/a/55553791"
+/>
+
+## Source code
+
+- 소스 코드는 사람이 보통 사람이 읽을 수 코드를 말하며 <small>(C, Java, JavaScript 같은 우리가 흔히 아는 언어로 써진 코드.)</small>
+- 컴파일러 같은 변환 프로그램에 의해 실행 가능한 코드로 변환된다.
+
+## Assembly code
+
+- 어셈블리 코드도 사람이 읽을 수 있으며, machine code와 1:1 대응된다.
+- 하지만 어셈블리 코드를 CPU가 알아먹진 못하기 때문에 어셈블러나 컴파일러로 변환해야 한다.
+- 컴퓨터 구조 시간에 보았을 아래와 같은 코드를 말한다.
+  - ```assembly
+    push ebp
+    mov  ebp, esp
+    ...
+    ```
+
+## Machine code
+
+- CPU가 바로 실행할 수 있는 binary 코드이다.
+- CPU의 아키텍처(ex. Intel, AMD, ARM 프로세서)에 따라 machine code가 달라진다.
+
+## Object code
+
+- [linking](<https://en.wikipedia.org/wiki/Linker_(computing)>) 과정을 거치지 않은 `machine code`.
+- 간단한 소스 코드의 경우 linking이 필요없기도 하다.
+- IDE의 경우 보통 컴파일+링킹이 같이 수행된다.
+
+```
+library files / other object files / Relocation object code information
+                                         \
+                                          v
+source code -(compiler)-> object code -(linker)-> machine code
+```
+
+## Byte code
+
+- `source code`와 `machine code`의 중간 코드.
+- **인터프리터**가 `byte code`를 OS마다 적합한 `machine code`로 변환한다.
+- Java의 JVM 인터프리터, CPython의 인터프리터 등이 이 과정을 수행한다.
+
+```
+source code -(compiler)-> byte code -(JVM/CPython etc.) --> Windows machine code
+                                                        \_> Linux machine code
+                                                        \_> Mac OS machine code
+```
+
+## 참고
+
+- [Medium | machine-code-vs-byte-code-vs-object-code-vs-source-code-vs-assembly-code](https://rahul-saini.medium.com/machine-code-vs-byte-code-vs-object-code-vs-source-code-vs-assembly-code-812c9780f24c)
+- [stackoverflow](https://stackoverflow.com/questions/466790/assembly-code-vs-machine-code-vs-object-code)
