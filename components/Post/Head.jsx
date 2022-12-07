@@ -20,7 +20,7 @@ const Head = ({ title, uploaded, updated, tags }) => {
         ))}
       </div>
 
-      <h1 className="text-3xl sm:text-4xl font-extrabold mb-2 sm:mb-4 mt-6 sm:mt-10">{title}</h1>
+      <h1 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-4 mt-6 sm:mt-10">{title}</h1>
       <div className="flex  py-2 md:py-3 pl-1 text-neutral-500">
         <small className="">{uploadedDate}에 작성</small>
         {uploadedDate < updatedDate && (

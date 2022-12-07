@@ -1,8 +1,8 @@
 import { MDXRemote } from 'next-mdx-remote';
-import Layout from './Layout';
-import { Head as PostHead, Image, Callout, CodeBlock, Utterances } from './Post';
+import Layout from '../Layout';
+import { Head as PostHead, Image, Callout, CodeBlock, Utterances } from '.';
 
-const PostPage = ({ mdxSource, ...frontMatter }) => {
+const Page = ({ mdxSource, ...frontMatter }) => {
   return (
     <Layout>
       <div className="px-2 md:px-4 py-2 md:py-4">
@@ -16,4 +16,4 @@ const PostPage = ({ mdxSource, ...frontMatter }) => {
   );
 };
 
-export default PostPage;
+export default Page;

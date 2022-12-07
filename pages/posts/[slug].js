@@ -4,7 +4,7 @@ import matter from 'gray-matter';
 
 import { ArticleJsonLd, NextSeo } from 'next-seo';
 import { serialize } from 'next-mdx-remote/serialize';
-import PostPage from '../../components/PostPage';
+import Page from '../../components/Post/Page';
 
 import site from '../../siteMetadata';
 
@@ -54,7 +54,7 @@ export default function Post({ frontMatter, slug, mdxSource }) {
         authorName={site.author}
         url={`${site.url}/posts/${slug}`}
       ></ArticleJsonLd>
-      <PostPage mdxSource={mdxSource} {...frontMatter} />
+      <Page mdxSource={mdxSource} {...frontMatter} />
     </>
   );
 }

@@ -14,7 +14,7 @@ const Footer = () => {
           </a>
         </div>
       </div>
-      <span className="text-sm md:text-base text-neutral-500">
+      <span className="text-sm text-neutral-500">
         {siteMetadata.author} © {`${new Date().getFullYear()}`}
       </span>
     </footer>
