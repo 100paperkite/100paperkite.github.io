@@ -1,0 +1,29 @@
+---
+title: Maven
+description:
+uploaded: '2022-12-08'
+updated: '2022-12-08'
+tags: ['TIL', 'Java']
+draft: false
+---
+
+- Java의 빌드 및 의존성 관리 툴이며 `pom.xml` 파일로 관리한다.
+- 의존성은 `pom.xml` 에 기술해둔 GAV(GroupId, ArtifactId, Version)정보로 관리한다.
+
+## npm과 비교?
+
+원래 알고 있던 `npm`이랑 비교해서 보면 좋을 것 같아서 정리해보면
+
+- `pom.xml`은 `npm` 의 `package.json` 과 유사한 용도이다
+- `maven`은 [npm](https://registry.npmjs.org/) 처럼 [public repo](https://repo.maven.apache.org/maven2/)가 있다.
+- local repository(cache)가 추가적으로 존재해서
+  - 같은 의존성을 가지는 다른 프로젝트에서 참조가 가능하다.
+  - 유저 홈 디렉토리의 `.m2` 폴더에 의존성들이 저장된다. npm은 프로젝트마다 `node_modules`을 가지는 것과 차이가 있다.
+- maven으로 빌드하는 과정은 one-step 으로 진행되는데, 이는 npm에서 install 후 build를 합친 형태이다.
+- `package.json` 에서 `script`로 빌드 프로세스를 정의하는 형식처럼 maven에서도 building, testing, deploying같은 빌드 과정들을 정의할 수 있다.
+- npm에서 dev, production을 구분하는 방식은 pom.xml에서 `profile` 속성을 정의하면 된다.
+
+## 참고
+
+[https://stackoverflow.com/questions/38388824/is-maven-similar-to-npm](https://stackoverflow.com/questions/38388824/is-maven-similar-to-npm)
+[https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html](https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html)
