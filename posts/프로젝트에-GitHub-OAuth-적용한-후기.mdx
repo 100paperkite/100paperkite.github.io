@@ -1,0 +1,51 @@
+---
+title: 프로젝트에 GitHub OAuth 적용하기
+description:
+uploaded: '2022-12-13'
+updated:
+tags: []
+draft: true
+---
+
+이전에 `good-first-issue` 이슈가 존재하는 GitHub 프로젝트 목록을 볼 수 있는 웹앱을 만드는 [토이프로젝트](https://github.com/100paperkite/good-first-issue)를 진행했다.
+
+이 프로젝트에서는 여러가지 깃헙 정보를 가져오기 위해서 GitHub API를 사용했는데, 특히 GitHub에서 GraphQL로 제공하는 API(레포 정보를 가져오거나 이슈를 가져오는 등등)를 사용해야 했었다.
+
+그런데 GitHub에서는 GraphQL로 제공하는 API는 일반 REST API와 달리 [사용자 인증](https://docs.github.com/en/graphql/guides/forming-calls-with-graphql#authenticating-with-graphql)이 필요했기 때문에 웹앱에서 사용자 인증을 했어야 했고, OAuth를 사용해보게 되었다. <small>(사실 GraphQL을 쓰지 않더라도 REST API 호출 수가 1시간에 60번인가로 너무 적었기 때문에 어찌 됐든 인증과정이 필요하긴 했다.)</small>
+
+## OAuth?
+
+OAuth는 인증을 위한 프로토콜로, 사용자가 다른 인터넷 서비스<small>(여기선 GitHub)</small>의 기능을 다른 애플리케이션에서도 사용할 수 있게 한 것이다.
+
+## 프로젝트에서 GitHub OAuth 인증 과정
+
+웹앱에서 Github의 GraphQL API를 사용하려면 POST 요청의 body에 깃헙에서 발급받은 token을 포함해서 요청해야 한다.
+
+그렇기 때문에 깃헙으로부터 token을 발급 받아와야 하는데, 발급 과정은 다음과 같이 이루어진다.
+
+1. 사용자가 클라이언트에서 깃헙에 로그인한다.
+2. 로그인이 완료되면 깃헙이 `access_token` 발급을 위한 `code`를 발급해준다. (리디렉션되면서 url 파라미터에 붙어온다)
+3. **\***클라이언트에서 <small>(직접 올린)</small>프록시 서버에 `code`를 보내서 토큰 발급을 요청한다.
+
+---
+
+**\***여기서 클라이언트에서 바로 `code` 로 깃헙에 `access_token`을 요청하지 않고, 외부 서버를 거치는 이유는 브라우저의 **Same-Origin Policy**<small>(보안을 위해 프로토콜, 포트, 도메인이 같은 서버로만 요청을 할 수 있게 하는 정책)</small>때문이다.
+
+이걸 해결하기 위해서는 요청을 받는 서버에서 CORS 설정을 해줘야 하지만 GitHub에서는 `access_token`발급에 해당 설정을 해두진 않아서 브라우저에서 바로 요청할 수 없다.
+
+code를 발급받기 위해 깃헙에 보내는 요청은, 해당 요청의 응답 헤더를 보면 깃헙에서 **access-control-allow-origin:** \* 로 설정해서 내려주고 있으므로 CORS 문제가 없다.
+
+---
+
+4. 프록시 서버에서는 클라이언트의 요청을 code와 함께 받으면, `client_secret` 키(깃헙에 웹앱을 등록하면 발급해준다)와 함께 GitHub에 `access_token` 발급을 요청한다.
+5. GitHub에서 해당 유저의 `access_token` 발급이 완료되면 클라이언트에 해당 토큰을 응답으로 보낸다.
+   - 이 프록시 서버는 내가 직접 올린 서버이므로 CORS 설정을 해주기 때문에 클라이언트에서 `CORS` 에러가 생기지 않는다.
+6. 이제 클라이언트에서는 이 토큰으로 GitHub API를 요청할 수 있다. <small>(해당 토큰은 브라우저의 로컬 스토리지에 저장)</small>
+
+## 여담
+
+그런데 정리하면서 프로젝트를 확인했는데 프록시 서버가 동작하지 않아서 봤더니... 기존에 프록시 서버를 무료인 heroku로 올려놨었는데, 올해 11월 28일부터 프리 티어를 아예 없애서 프록시 서버가 꺼졌다.. 다른 프리티어 솔루션을 찾아서 다시 적용해야할 듯.
+
+## 참조
+
+- [깃헙 OAuth 가이드 문서](https://docs.github.com/ko/developers/apps/building-oauth-apps/authorizing-oauth-apps)
