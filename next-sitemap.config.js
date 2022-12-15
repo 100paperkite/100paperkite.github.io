@@ -6,6 +6,7 @@ const path = require('path');
 module.exports = {
   siteUrl: site.url,
   generateRobotsTxt: true,
+  generateIndexSitemap: false,
   sitemapSize: 7000,
   outDir: 'out',
 
