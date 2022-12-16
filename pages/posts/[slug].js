@@ -4,6 +4,7 @@ import matter from 'gray-matter';
 
 import { ArticleJsonLd, NextSeo } from 'next-seo';
 import { serialize } from 'next-mdx-remote/serialize';
+import remarkGfm from 'remark-gfm';
 import Page from '../../components/Post/Page';
 
 import site from '../../siteMetadata';
@@ -26,7 +27,11 @@ export const getStaticProps = async ({ params: { slug } }) => {
   const markdownWithMeta = fs.readFileSync(path.join('posts', `${slug}.mdx`), 'utf-8');
 
   const { data: frontMatter, content } = matter(markdownWithMeta);
-  const mdxSource = await serialize(content);
+  const mdxSource = await serialize(content, {
+    mdxOptions: {
+      remarkPlugins: [remarkGfm],
+    },
+  });
 
   return {
     props: {
