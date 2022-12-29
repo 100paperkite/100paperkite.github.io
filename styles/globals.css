@@ -24,9 +24,6 @@
   .prose pre {
     @apply text-sm sm:text-base p-3 md:p-4 !important;
   }
-  .prose h2 {
-    @apply text-2xl sm:text-3xl;
-  }
 
   nav {
     @apply bg-gradient-to-t from-neutral-50/0 via-neutral-50/90 to-neutral-50/100;
