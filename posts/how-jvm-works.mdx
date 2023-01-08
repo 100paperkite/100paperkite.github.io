@@ -1,0 +1,168 @@
+---
+title: JVM(Java Virtual Machine)
+description:
+uploaded: '2023-01-08'
+updated:
+tags: ['java', 'jvm']
+draft: false
+---
+
+## 가상 머신(Virtual Machine)
+
+안에서 돌아가는 소프트웨어가 가상머신이 제공하는 환경과 자원에 제한을 받으며 가상 환경을 벗어날 수 없다.
+
+- System Virtual Machine
+  - 완전한 OS 실행을 지원.
+  - 같은 컴퓨터 내에서 여러 운영체제를 돌릴 수 있다.
+- Process Virtual Machine
+  - 단일 프로세스를 지원
+  - 플랫폼에 독립적인 실행환경과 추상화를 제공하여 하나의 프로그램을 실행한다.
+  - JVM이 이런 경우다. (C#의 CLR도 마찬가지)
+
+## JVM?
+
+JVM은 명세이다. 이 명세를 따른 구현체들이 따로 존재한다. (HotSpot VM 등등)
+
+## JVM Architecture
+
+Java로 작성된 코드는 Compiler가 바이트 코드(.class 파일) 로 변환하고, JRE에 속한 JVM이 이 바이트 코드를 JIT 컴파일하여 실행된다.
+
+- JDK (Java Development Kit)
+  - JRE를 포함하며, 개발을 위한 컴파일러나 디버거도 같이 제공된다.
+- JRE (Java Runtime Environment)
+
+## 구성 요소
+
+<Image
+  src="/jvm-architecture.png"
+  alt="jvm architecture"
+  height="360px"
+  sourceHref="https://www.freecodecamp.org"
+/>
+
+## Class Loader
+
+<Image
+  src="/jvm-class-loader.png"
+  alt="jvm class loader"
+  height="300px"
+  sourceHref="https://www.freecodecamp.org"
+/>
+
+### Loading
+
+#### 1. 클래스 정보를 읽어온다.
+
+- ‘.class’ 파일을 읽으면, 관련된 바이너리 데이터를 생성하고 이를 method area에 저장한다.
+- method area에 저장되는 정보들은 다음과 같다
+  - 패키지 명이 전부 포함된 클래스 경로(Fully Qualified Name), 해당 클래스의 부모 클래스
+  - ‘.class’파일이 Class인지, Interface인지 Enum인지 여부
+  - 접근 한정자(private, public …)와 메서드 정보 등
+
+JVM이 클래스를 불러올 때 사용하는 3가지 로더는 다음과 같다.
+
+1.  Bootstrap ClassLoader
+    - 최상위 ClassLoader이다. 이 로더가 JAR파일이나` $JAVA_HOME/jre/lib` 경로의 코어 라이브러리에서 패키지를 불러온다.
+2.  Extension ClassLoader
+    - Bootstrap 클래스 로더의 하위 클래스이고, Application ClassLoader의 상위 클래스이다.
+    - `$JAVA_HOME/jre/lib/ext` 경로에서 패키지 파일을 불러온다.
+3.  Application ClassLoader
+    - 이 클래스로더는 classpath의 파일들을 불러온다. (기본 경로값은 현재 어플리케이션 디렉토리)
+    - 클래스를 못 찾으면 `ClassNotFoundError`를 던진다.
+
+#### 2. 정보를 읽어온 후엔 클래스 타입의 오브젝트를 생성한다.
+
+- JVM이 클래스를 처음 로딩해오면 JVM은 `java.lang` 패키지에 정의된 `Class` 클래스에서 오브젝트를 생성한다.
+- 이 클래스 오브젝트는 프로그래머가 클래스들의 정보(클래스명, 부모 클래스명, 메서드나 변수 정보 등)를 얻기 위해 사용할 수 있다.
+- 클래스마다 하나의 오브젝트만 존재하도록 관리된다.
+- 그리고 이 ‘Class’타입 오브젝트는 힙에 저장된다.
+
+### Linking
+
+#### 1. Verification
+
+- .class파일을 로딩해올 때, bytecode verifier라는 프로그램이 .class파일을 검증한다.
+  - 유효한 컴파일러로 컴파일 된 것인지.
+  - 올바른 구조, 포맷인지.
+- verification중 하나라도 실패하면 JVM은 verifier exception 에러를 런타임에 던진다.
+
+#### 2. Preparation
+
+- 만약 클래스가 instance level이거나 static 변수를 가지고 있으면 기본값으로 초기화 시킨다. (설정해둔 초기값이 아님)
+- ex. boolean → false, int → 0, 이런 식.
+
+#### 3. Resolution
+
+- 참조 변수들을 실제 메모리 주소값으로 변경한다.
+
+### Initialization
+
+코드로 설정한 초기값들이 여기서 할당된다. 그리고 클래스의 정적 영역들이 실행된다.
+
+## Memory Area (= Runtime Data Area)
+
+<Image
+  src="/jvm-runtime-data.png"
+  alt="jvm runtime data"
+  height="240px"
+  sourceHref="https://www.freecodecamp.org"
+/>
+
+- **Method Area**
+  - 모든 클래스 정보. (method data, constructor details …)
+  - JVM마다 하나가 존재하며, 다른 스레드들과 공유되는 공간이다.
+- **Heap**
+  - 모든 오브젝트, static 변수(JAVA 8부터 적용)
+  - JVM마다 하나가 존재하며, 다른 스레드들과 공유되는 공간이다.
+- **Stack**
+  - 함수 호출마다 쌓임. 로컬 변수들이 저장된다.
+  - 각 스레드마다 존재하며, 스레드가 종료되면 해당 영역도 제거된다.
+- **PC Register**
+  - 각 스레드마다 존재하며, 현재 실행중인 명령어 위치를 저장한다.
+- **Native Method Stack**
+  - 각 스레드마다 존재하며, native methods 정보를 저장한다.
+
+## Execution Engine
+
+<Image
+  src="/jvm-execution-engine.png"
+  alt="jvm execution engine"
+  height="250px"
+  sourceHref="https://www.freecodecamp.org"
+/>
+
+`.class` 코드(bytecode)를 실행한다.
+
+### Interpreter
+
+- bytecode를 읽으면서 machine code로 변환한다.
+
+### JIT compiler
+
+- JVM은 처음엔 인터프리터를 쓰지만, 해석해야 할 bytecode가 반복적이면, JVM은 JIT를 대신 사용해서 전체 코드를 machine code로 컴파일한다. (매번 같은 코드에 대해 인터프리터를 사용하는 것 보다 한번에 컴파일해서 최적화 하는게 더 빠르기 때문)
+- JIT compiler는 다음과 같은 4가지로 이루어져 있다
+  - Intermediate Code Generator - 중간 코드 생성
+  - Code Optimizer - 코드 최적화
+  - Target Code Generator - 머신 코드 생성
+  - Profiler - 최적화를 위해 반복되는 코드를 찾음(hotspot)
+
+### GC(Garbage Collector)
+
+- C 같은 언어들은 프로그래머가 직접 메모리를 할당/해제 해야 하지만 Java는 JVM이 알아서 처리해준다.
+- GC는 백그라운드로 실행되면서 주기적으로, 더 이상의 참조가 없는 Heap 상의 오브젝트들을 해제한다.
+  - Mark → 메모리에서 더 이상 쓰지 않는 오브젝트들을 마킹.
+  - Sweep → 마킹된 오브젝트들을 해제.
+- GC 방법엔 여러가지가 있다.
+  - Serial GC → 싱글스레드 환경으로 돌아감. GC가 동작하면 어플리케이션이 멎어버림.
+  - Parallel GC → 멀티 스레드를 이용. (하지만 여전히 어플리케이션이 멎을 때가 있음)
+  - G1GC
+
+### JNI interface
+
+JVM에서 실행하는 자바 코드가 네이티브 응용 프로그램이나 다른 언어로 작성된 라이브러리를 호출/호출되는 것을 가능하게 하는 프레임워크. .dll 또는 .so 포맷.
+
+## 참고
+
+- [https://hasithas.medium.com/understanding-how-java-virtual-machine-jvm-works-a1b07c0c399a](https://hasithas.medium.com/understanding-how-java-virtual-machine-jvm-works-a1b07c0c399a)
+
+- [https://www.geeksforgeeks.org/jvm-works-jvm-architecture/](https://www.geeksforgeeks.org/jvm-works-jvm-architecture/)
