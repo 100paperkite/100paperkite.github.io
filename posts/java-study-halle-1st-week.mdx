@@ -1,0 +1,89 @@
+---
+title: '백기선님 자바 스터디 1주차 정리'
+description:
+uploaded: '2023-01-09'
+updated:
+tags: ['study-halle', 'java']
+draft: false
+---
+
+<Image src="/study-halle.jpeg" alt="study halle image" height="400px" />
+
+자바를 공부하려고 '혼자 공부하는 자바'라는 책을 사서 읽어봤었는데, 기초 책이다보니 얕게 배우고 끝난 것 같아 좀 더 자세하게(JVM 작동 원리라던지)알고 싶은 마음이 있었다.
+
+이전 포스팅에 JVM 작동 방식을 따로 찾아서 정리한 것 처럼 주로 궁금한 게 생기면 그때 찾아보는 식이었는데, 우연히 괜찮은 [유튜브 스터디](https://youtube.com/playlist?list=PLfI752FpVCS96fSsQe2E3HzYTgdmbz6LU)를 발견해서 쭉 해보려고 한다.
+
+---
+
+## 목표
+
+자바 소스 파일(.java)을 JVM으로 실행하는 과정 이해하기.
+
+## 학습할 것
+
+- JVM이란 무엇인가
+- 컴파일 하는 방법
+- 실행하는 방법
+- 바이트코드란 무엇인가
+- JIT 컴파일러란 무엇이며 어떻게 동작하는지
+- JVM 구성 요소
+- JDK와 JRE의 차이
+
+---
+
+## JVM이란 무엇인가?
+
+자바를 실행하기 위한 프로그램. JVM은 자바 프로그램을 실행할 때, Java를 Java bytecode(`.class` 파일)로 컴파일(명령어는 `javac`) 한 후 실행하며, 컴파일된 바이트코드는 `java <arguments> <program name>` 명령어로 실행한다.
+JVM은 컴파일된 바이트 코드를 인터프리터를 이용해 런타임에 instruction(= machine code)으로 해석하면서 프로그램을 실행하며 JIT 컴파일러를 이용해서 인터프리터 대신에 바이트 코드를 한번에 machine code로 변환해서 최적화하기도 한다.
+
+**JVM의 설계 목표이자 특징**
+
+- 어플리케이션 코드가 돌아갈 수 있는 컨테이너 역할
+  - jvm + bytecode interpreter
+- C/C++과는 다르게 안전한(메모리 관리 등) 실행환경 제공
+  - 직접적인 메모리 참조가 불가능하며, bytecode verification을 제공한다.
+- 프로그래머가 신경쓰지 않아도 되는 메모리 관리.
+- 크로스 플랫폼 실행 환경 제공 (Write Once Run Anywhere)
+  - class 파일로 변환된 파일은 어떤 OS(macOS, windows, linux …)이든 실행가능
+
+## JIT Compiler
+
+런타임에 더 자주 실행되는 부분(hot spot)을 찾아서 최적화하기 위한 컴파일러.
+매번 bytecode를 machine code로 해석하지 않고, 해석해둔 코드를 계속 사용하거나 코드 자체를 최적화한다.
+
+## 바이트코드
+
+`javac` 컴파일러가 java를 컴파일해서 내놓는 중간 결과물. `.class`파일이며 JVM이 이 파일을 런타임에 해석하면서 실행한다.
+명령어 종류를 나타내는 opcode가 1바이트라 바이트코드라 부른다. 대략 200개 정도 사용 중. Bytecode는 플랫폼(or 머신)에 종속적이지 않으며 항상 동일한 포맷이다. [Endian](https://ko.wikipedia.org/wiki/%EC%97%94%EB%94%94%EC%96%B8)의 경우도 마찬가지인데, 어떤 플랫폼에서 생성되었던 간에, Big Endian<small>(0x1234의 경우 `12 34` 로 저장하는 식. Little endian은 `34 12` 이다.)</small>을 따른다.
+
+## 컴파일/실행 하는 방법
+
+### 컴파일
+
+java 컴파일러는 JDK(Java Development Kit)에 들어있다.
+
+`javac` 명령어로 컴파일할 수 있고, 컴파일 결과는 `.class` 파일로 구성된 자바 바이트코드 파일이다. 컴파일할 자바 버전을 지정할 수도 있는 등 여러 옵션을 제공한다.
+
+```java
+$ javac [-source <컴파일할 소스 코드의 자바 버전>] [-target <컴파일될 코드의 자바 지원 버전>] ...
+```
+
+컴파일된 바이트코드는 `javap -c <바이트코드 파일경로>`명령어로 확인해볼 수 있다.
+
+### 실행
+
+`java` 명령어로 컴파일된 바이트코드를 실행할 수 있다.
+
+## JDK<small>(Java Development Kit)</small> vs JRE<small>(Java Runtime Environment)</small>
+
+JRE는 말그대로 실행하기 위해 필요한 것들만 분리해둔 것이라 JRE가 JDK안에 속해있다. JDK에는 JRE뿐만 아니라 컴파일러, 디버거 등 개발에 필요한 도구들이 포함되어있다.
+Java 9 버전 부터는 JRE를 따로 제공하지는 않는다고 한다
+
+## JVM 구성 요소
+
+[JVM 정리](./how-jvm-works)
+
+## 참고
+
+- [[Book] Java in a Nutshell 7th Edition](https://learning.oreilly.com/library/view/java-in-a/9781492037248/)
+- [Study Halle](https://youtube.com/playlist?list=PLfI752FpVCS96fSsQe2E3HzYTgdmbz6LU)
