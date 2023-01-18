@@ -1,0 +1,131 @@
+---
+title: '[자바 스터디] 2주차 정리'
+description:
+uploaded: '2023-01-18'
+updated:
+tags: ['study-halle', 'java']
+draft: false
+---
+
+<Image src="/study-halle.jpeg" alt="study halle image" height="400px" />
+
+## 목표
+
+자바의 프리미티브 타입, 변수 그리고 배열을 사용하는 방법을 익힙니다.
+
+## 학습할 것
+
+- 프리미티브 타입 종류와 값의 범위 그리고 기본 값
+- 프리미티브 타입과 레퍼런스 타입
+- 리터럴
+- 변수 선언 및 초기화하는 방법
+- 변수의 스코프와 라이프타임
+- 타입 변환, 캐스팅 그리고 타입 프로모션
+- 1차 및 2차 배열 선언하기
+- 타입 추론, var
+
+---
+
+## Primitive Type
+
+| Type    | Contains                | Default | Size   | Range                                     |
+| ------- | ----------------------- | ------- | ------ | ----------------------------------------- |
+| boolean | true or false           | false   | 1bit   |                                           |
+| char    | unicode                 | \u0000  | 16bits | \u0000 ~ \uffff                           |
+| byte    | signed integer          | 0       | 8bits  | -128 ~ 127                                |
+| short   | signed integer          | 0       | 16bits | –32768 ~ 32767                            |
+| int     | signed integer          | 0       | 32bits | –2147483648 ~ 2147483647                  |
+| long    | signed integer          | 0       | 64bits | 9223372036854775808 ~ 9223372036854775807 |
+| float   | IEEE 754 floating point | 0.0     | 32bits | 1.4E–45 ~ 3.4028235E+38                   |
+| double  | IEEE 754 floating point | 0.0     | 64bits | 4.9E–324 ~ 1.7976931348623157E+308        |
+
++) Java에는 `unsigned` primitive type이 없다.
+
+## Primitive vs Reference
+
+- Primitve는 프로그래머가 정의할 수 없음.
+- Primitive는 값 자체를 표현하지만, Reference 타입은 메모리 참조 값임.
+- Primitive는 값을 항상 전체 복사해서 전달하지만, Reference는 해당 메모리 값만을 전달하며, 메모리는 힙에 저장되어 GC의 대상이 된다.
+
+### Boxing, Unboxing
+
+Java에서는 Primitive type의 Wrapper클래스(`Boolean`, `Byte`, `Short`, `Character`, `Integer`, `Long`, `Float`, `Double`)를 제공하고, 주로 Collection에 값을 저장할 때 사용한다(Generic은 참조 값만 지원하기 때문). ex `List<Integer>`
+
+- Boxing : Primitive → Reference
+- Unboxing: Reference → Primitive
+
+Java에서 boxing,unboxing은 타입 캐스팅 필요없이 자동으로 일어난다. 불필요한 boxing, unboxing은 성능 오버헤드가 발생하므로 Collections로 쓰는게 아니라면 Primitive를 쓰자.
+
+## Literal
+
+상수값을 나타내는 문자.
+
+```java
+1    1.0    '1'    1L    "one"    true    false    null
+```
+
+- integer literal → int로 취급.
+  - long → `L` , octa → `0` , hex → `0x` , binary → `0b`를 붙여야 함
+- floating point는 overflow나면 Infinity. underflow나면 0.
+
+```java
+double inf = 1.0/0.0;             // Infinity
+double neginf = -1.0/0.0;         // Negative infinity
+double negzero = -1.0/inf;        // Negative zero
+double NaN = 0.0/0.0;             // Not a Number
+```
+
+## 변수 선언 및 초기화
+
+```java
+int <변수 이름> = 0; // primitive type
+Player <변수 이름> = new Player(); // reference type은 new와 생성자 함수로 초기화
+```
+
+## 변수의 스코프와 라이프타임
+
+- 클래스 변수 - 클래스로더가 클래스를 로딩할 때 메모리에 할당 (static). 모든 클래스 인스턴스가 해당 변수를 공유.
+- 인스턴스 변수 - 인스턴스가 생성될 때 메모리에 할당되고 인스턴스가 해제될 때 같이 해제됨.
+- 지역 변수 - 메서드 내에서 선언. 메서드 내에서만 사용 가능
+
+## 타입 변환, 캐스팅 그리고 타입 프로모션
+
+- **타입 변환**
+  - 변수의 타입을 다른 타입으로 변경하는 것
+- **타입 캐스팅 (강제 변환)**
+  - `()` 연산자를 이용해 강제로 형변환한다.
+  - 강제로 형변환하기 때문에 값 손실이 있을 수 있다. ex `(int)3.14f -> 3`
+- **타입 프로모션 (자동 변환)**
+  - 하위 타입이 상위 타입으로 변경되는 경우.
+  - `byte → short → int → long → float → double`
+
+## 1차 및 2차 배열 선언하기
+
+```java
+int[] arr1 = new int[2]; // 1차원 배열
+
+int[][] arr = new int[2][3]; // 2x3 배열
+int[][] arr = new int[][] {{1,0}, {2}}; // 선언과 동시 초기화, 서로 다른 길이로 선언 가능.
+```
+
+## 타입 추론, `var`
+
+```java
+var list = new ArrayList<String>();
+```
+
+Java10부터 추가된, 변수 선언 시 초기화 값을 바탕으로 타입을 추론해주는 키워드(.NET에도 있다).
+선언 시 타입을 여러번 쓰지 않아도 되므로 코드를 깔끔하게 유지할 수 있으며, 표현하기 곤란한 타입을 나타내는데도 좋다.
+다만 아래와 같은 경우들은 `var` 키워드를 이용한 타입 추론이 불가능하다.
+
+```java
+var x; // 초기화 필요
+var x = null // null로는 초기화 불가
+var arr = {1,2,3} // 배열 초기화는 불가
+var f = () -> {} // lambda 불가
+```
+
+## 참고
+
+- [[Book] Java in a Nutshell 7th Edition](https://learning.oreilly.com/library/view/java-in-a/9781492037248/)
+- [Study Halle](https://youtube.com/playlist?list=PLfI752FpVCS96fSsQe2E3HzYTgdmbz6LU)
