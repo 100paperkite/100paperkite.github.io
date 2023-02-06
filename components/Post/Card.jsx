@@ -6,7 +6,8 @@ const formatDate = (dateString) => {
   return yyyymmdd.replaceAll('-', '.');
 };
 
-const Card = ({ title, uploaded, tags, slug }) => {
+const Card = ({ post: { frontMatter, slug } }) => {
+  const { title, uploaded, tags } = frontMatter;
   const uploadedDate = formatDate(uploaded);
 
   const isTagExist = (tags ?? []).length === 0 ? false : true;
@@ -23,8 +24,8 @@ const Card = ({ title, uploaded, tags, slug }) => {
 
         {isTagExist && (
           <span className="text-xs flex flex-wrap gap-x-2 my-auto">
-            {tags.map((tag) => (
-              <Tag name={tag} key={tag} className="text-neutral-500 font-bold" />
+            {tags.map((tag, index) => (
+              <Tag name={tag} key={index} />
             ))}
           </span>
         )}
