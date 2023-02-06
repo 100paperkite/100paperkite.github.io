@@ -1,39 +1,28 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
 import HomePage from '../components/HomePage';
 import { NextSeo } from 'next-seo';
 
 import site from '../siteMetadata';
+import { getAllPostInfos } from '../lib/util';
 
 export const getStaticProps = async () => {
-  const files = fs.readdirSync(path.join('posts'));
-
-  let posts = files.map((filename) => {
-    const markdownWithMeta = fs.readFileSync(path.join('posts', filename), 'utf-8');
-    const { data: frontMatter } = matter(markdownWithMeta);
-    return {
-      frontMatter,
-      slug: path.parse(filename).name,
-    };
-  });
+  let postInfos = await getAllPostInfos();
 
   if (process.env.NODE_ENV === 'production') {
-    posts = posts.filter(({ frontMatter: { draft } }) => draft === false);
+    postInfos = postInfos.filter(({ draft }) => draft === false);
   }
 
   return {
     props: {
-      posts,
+      postInfos,
     },
   };
 };
 
-export default function Home({ posts }) {
+export default function Home({ postInfos }) {
   return (
     <>
       <NextSeo title={site.title} description={site.description} />
-      <HomePage posts={posts} />
+      <HomePage postInfos={postInfos} />
     </>
   );
 }
