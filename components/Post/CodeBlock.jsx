@@ -1,5 +1,5 @@
 import { LightAsync as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { github as style } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
+import { tomorrowNightEighties as style } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 
 const CodeBlock = ({ children: { props } }) => {
   const { className, children: codeString } = props;

@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Spoqa Han Sans Neo', ...defaultTheme.fontFamily.sans],
+        sans: [...defaultTheme.fontFamily.sans],
         title: ['-apple-system', 'system-ui', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Ubuntu'],
       },
     },
