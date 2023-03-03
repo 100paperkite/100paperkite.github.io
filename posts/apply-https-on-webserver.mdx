@@ -1,0 +1,123 @@
+---
+title: '웹서버에 HTTPS 적용하기 (Let’s Encrypt, Nginx, AWS EC2)'
+description:
+uploaded: '2023-03-03'
+updated:
+tags: ['https', 'backend', 'nginx']
+draft: false
+---
+
+## 가정
+
+<Image src="/apply-https-on-webserver-0.png" height="450px" />
+
+- HTTP를 적용할 웹 어플리케이션 서버가 AWS EC2에 올려져 있다.
+- Nginx를 사용해 HTTPS 설정을 한다. (클라이언트로부터 요청이 들어오면 Nginx가 서버 앞단에서 요청을 대신 받아서 웹 어플리케이션 서버에 넘겨준다. - 이를 [리버스 프록시](https://ko.wikipedia.org/wiki/%EB%A6%AC%EB%B2%84%EC%8A%A4_%ED%94%84%EB%A1%9D%EC%8B%9C)라 한다)
+
+## Nginx 설정하기
+
+### Nginx 설치
+
+```bash
+# 설치 1 (redhat 계열. ex. Amazon linux 2)
+sudo yum clean metadata
+sudo yum -y install nginx
+
+# 만약 패키지를 찾을 수 없다고 나오면 아래 명령어를 실행하자.
+sudo amazon-linux-extras enable nginx1
+
+# 설치 2 (debian 계열. ex. Ubuntu)
+sudo apt-get install nginx
+```
+
+### Nginx 설정 파일 수정하기
+
+설치하고 나면 `/etc/nginx` 디렉터리가 생성된다. nginx의 루트 설정 파일은 `/etc/nginx/nginx.conf` 인데, 보통 해당 파일을 직접 수정하진 않고, 여러 하위 설정파일을 두고 이 파일에서 모듈처럼 로딩해서 사용한다. (코드에서 중복 제거하는 것 처럼) nginx.conf 파일을 보면 있는 `include /etc/nginx/conf.d/*.conf` 코드가 설정을 로딩해온다.
+
+https 설정을 위해서 `conf.d` 폴더 하위에 `default.conf` 같은 새로운 설정파일을 생성하고 아래와 같이 작성하자.
+
+```bash
+server {
+    listen 443 ssl;
+    server_name <도메인 이름>
+
+    location / {
+        proxy_pass http://127.0.0.1:<웹서버가 사용하는 포트>;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+    }
+
+    # 아래 부분은 Let's encrypt를 통해 SSL 인증을 받은 키를 사용한다.
+    ssl_certificate /etc/letsencrypt/live/<SSL 발급받은 도메인 이름>/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/<SSL 발급받은 도메인 이름>/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+# http로 들어온 요청은 https로 리다이렉트 되도록 설정한다.
+server {
+    listen 80;
+    location / {
+        return 301 <도메인 이름>$request_uri;
+    }
+}
+```
+
+### Nginx 실행, 로딩 명령어
+
+설정이 완료되면 nginx를 실행시켜준다.
+
+```bash
+sudo service nginx start # nginx 서버 실행하기
+sudo service nginx reload # 설정 파일을 수정했다면 설정파일을 로딩해온다.
+```
+
+## SSL 인증서 발급하기
+
+nginx에서 사용하기 위한 SSL 인증서를 발급해보자. 우리가 흔히 아는 웹사이트들은 CA라는 루트 인증기관에서 인증서를 발급해주는데, 직접 발급하려면 `Let's encrypt` 로 발급할 수 있다(나를 내가 인증하는 식).
+
+### 도메인 구매
+
+인증서를 발급하려면 도메인이 무조건 있어야 한다. IP만으로는 설정할 수 없다.
+
+AWS에서 제공하는 public domain을 쓰면 안될까? 싶지만, AWS 도메인은 사실 임시로 부여하는 것들이라 보안 위험이 크기 때문에 애초에 LetsEncrypt에서 막아두었다.
+
+<Image src="/apply-https-on-webserver-1.png" height="200px" />
+
+도메인을 구매할 수 있는 사이트에서 저렴하게 도메인을 구매하거나, 무료로 도메인을 사용할 수 있는 사이트에서 발급하자.
+
+### Certbot 설치
+
+Let’s encrypt에서 추천하는 방식인 Certbot을 사용하면 SSL 인증서를 쉽게 발급할 수 있다.
+
+```bash
+sudo yum install certbot
+sudo yum install python-certbot-nginx # nginx용 플러그인 설치
+```
+
+### Let’s Encrypt로 SSL 발급하기
+
+```bash
+sudo certbot --nginx  -d <도메인 이름>
+```
+
+위 명령어를 실행하고 나면 `/etc/letsencrypt/live/` 하위에 도메인 이름으로 된 폴더가 하나 생기고, SSL 인증을 위한 파일들이 만들어진다.
+
+이 파일 경로를 nginx의 설정파일에 입력해주고, nginx 설정을 리로드해오면 모든 설정이 끝난다.
+
+## 인증서 갱신 자동화하기
+
+Let’s Encrypt는 90일 마다 인증서를 갱신해주어야 하는데, 직접 주기마다 갱신을 해주는 것은 불편하므로 스케줄러를 이용해서 자동화해보자. linux에는 `crontab` 이라는 스케줄러가 있으므로 `crontab` 을 사용한다.
+
+아래 명령어를 이용해서 편집기를 실행하자.
+
+```bash
+crontab -e # 스케줄러 편집기 실행
+```
+
+그리고 편집기에 매월 1일 0시 0분에 `certbot renew` 로 인증서를 갱신하는 아래 명령어를 입력하고 저장하면 스케줄러 등록이 끝난다.
+
+```bash
+0 0 1 * * certbot renew --renew-hook "sudo service nginx reload"
+```
