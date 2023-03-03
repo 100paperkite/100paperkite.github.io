@@ -1,0 +1,239 @@
+---
+title: '[GitHub Actions, AWS로 CI/CD 구축하기] - 1. GitHub Actions 구성하기'
+description:
+uploaded: '2023-03-03T09:41:29.368Z'
+updated:
+tags: ['ci/cd', 'aws', 'github']
+draft: false
+---
+
+## Overview
+
+![](/github-aws-ci-cd-0.png)
+
+서버 배포는 다음 과정을 거쳐 이루어진다.
+
+1. 레포지토리의 `main` 브랜치에 푸시하면 GitHub Action이 실행
+2. GitHub Actions 실행
+   1. 서버를 빌드
+   2. OpenID Connect로 AWS 인증
+   3. 빌드된 파일을 AWS S3에 업로드
+   4. 업로드가 완료되면 AWS CodeDeploy를 실행
+3. AWS CodeDeploy가 S3에 업로드된 zip 파일을 미리 정의해둔 EC2 인스턴스에 업로드
+4. CodeDeploy가 소스의 설정파일(appspec.yml)에 따라 스크립트를 실행하여 서버를 EC2 인스턴스에서 실행시킴
+
+## GitHub Actions
+
+GitHub Actions는 깃 레포지토리에 `.github/workflow` 디렉터리를 만들고 `yaml` 확장자 파일을 만들어서 구성할 수 있다. `main` 브랜치에 푸시되면 자동으로 서버를 빌드해서 AWS EC2에 배포하는 다음 파일을 보면서 과정을 살펴보자.
+
+### `yaml` 파일
+
+```yaml
+# [1]
+name: build and deploy a spring boot server application
+
+# [2]
+on:
+  push:
+    branches:
+      - main
+
+# [3]
+env:
+  applicationfolder: backend/gfi
+  AWS_REGION: # AWS 리전. ex. ap-north-east-2
+  S3_BUCKET: # 빌드 파일을 업로드할 S3 버킷 이름
+  CODE_DEPLOY_APP_NAME: # CodeDeploy에 설정한 앱 이름
+  CODE_DEPLOY_GROUP_NAME: # CodeDeploy에 설정한 그룹 이름
+
+#[4]
+jobs:
+  # [5]
+  build:
+    name: Build and Package
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.applicationfolder }}
+
+    # OIDC에 쓰이는 ID 토큰 발급을 위해 정의
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+	  # [5-1]
+      - uses: actions/checkout@v3
+
+	  # [5-2]
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+	  # [5-3]
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
+        shell: bash
+
+	  # [5-4]
+      - name: Execute Gradle build
+        run: ./gradlew build
+
+	  # [5-5] OIDC
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+	  # [5-6]
+      - name: Create a .env file
+        run: |
+          echo "PORT=${{ vars.SERVER_PORT }}" >> .env
+
+	  # [5-7]
+      - name: Make zip file
+        run: zip -r $GITHUB_SHA.zip ./
+        shell: bash
+
+      - name: Upload Artifact to s3
+        run: aws s3 cp $GITHUB_SHA.zip s3://${{ env.S3_BUCKET }}/
+
+  # [6]
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    # OIDC에 쓰이는 ID 토큰 발급을 위해 정의
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+      - run: |
+          aws deploy create-deployment \
+            --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
+            --deployment-group-name ${{ env.CODE_DEPLOY_GROUP_NAME }} \
+            --s3-location bucket=${{ env.S3_BUCKET }},bundleType=zip,key=$GITHUB_SHA.zip
+```
+
+### [1] name
+
+실행될 GitHub Actions의 이름을 정의한다.
+
+### [2] on
+
+`main` 브랜치에 푸시된 경우에만 GitHub Actions가 실행되도록 한다.
+
+### [3] env
+
+해당 액션에서 사용할 변수를 정의한다. 여기서 정의한 변수는 액션 내부에서 `${{ env.변수명 }}` 으로 사용할 수 있다.
+
+만약 여러 액션에서 사용할 변수를 공통적으로 정의하고 싶다면, GitHub 레포의 설정에 들어가서 Repository variable을 설정하면 `${{ vars.변수명 }}` 으로 액션 내부에서 가져올 수 있다 (다만 이 변수는 외부에 공개될 수 있으므로, 시크릿 키 같은 민감한 정보는 Secret variable로 설정해서 `${{ secrets.변수명 }}` 으로 사용하자.
+
+### [4] job
+
+액션이 실행될 때 수행할 작업(`job`)들을 정의한다.
+
+여기서는 서버 파일을 빌드하는 작업인 `build` 와, 해당 빌드 파일을 배포하는 `deploy` 두 개의 잡이 정의되었다. 그리고 잡들은 기본적으로 병렬적으로 실행되지만 여기서는 `build` 작업이 끝난 후에만 `deploy` 작업을 실행해야 하므로 `needs` 옵션을 설정해서 순서대로 실행되게 하였다.
+
+job 내부의 순서들은 `step` 을 통해 정의한다.
+
+### [5] job: build
+
+build 잡은 ubuntu 환경에서 실행(`runs-on`)하고, 변수에 설정해둔 폴더를(`working-directory`) 현재 디렉터리로 설정한다.
+
+#### 5-1
+
+가상머신에 해당 레포를 가져온다.
+
+#### 5-2
+
+Spring 서버 빌드를 위해 JDK를 설치한다.
+
+#### 5-3, 5-4
+
+Gradlew로 빌드 할 수 있도록 실행권한을 부여하고, 서버를 빌드한다.
+
+#### 5-5
+
+빌드된 서버를 AWS에 업로드하기 위해서는 업로드할 AWS 계정에 대한 인증이 필요하다.
+
+이전까지는 깃헙 액션을 이용하는 IAM 유저를 생성한 후에 AWS 액세스 키를 발급해서 인증하는 아래와 같은 방식이 많았지만,
+
+```yaml
+uses: aws-actions/configure-aws-credentials@v1
+with:
+  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  aws-region: ${{ secrets.AWS_REGION }}
+```
+
+[https://github.com/aws-actions/configure-aws-credentials](https://github.com/aws-actions/configure-aws-credentials) 의 리드미를 보면, [GitHub's OIDC provider](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) 를 이용해 인증하는 방식을 추천하고 있으므로 여기서는 OpenID Connect를 통해 인증하는 방식을 사용했다.
+
+이 방식을 사용하면 1. 키를 주기적으로 재발급하거나 2. 프로젝트마다 키를 새로 발급하는 귀찮은 과정을 생략할 수 있다.
+
+#### OIDC 셋업하기
+
+**1) 자격 증명 공급자 추가**
+
+이 방식을 사용하려면 AWS의 IAM 유저 콘솔에 들어가서, 공급자 URL은 `https://token.actions.githubusercontent.com`, 대상은 `http://sts.amazonaws.com` 으로 설정한 후 ‘공급자 추가'를 누른다.
+
+![](/github-aws-ci-cd-1.png)
+
+**2) 역할 및 신뢰 관계 설정**
+
+GitHub Actions에서 AWS의 S3 버킷과 CodeDeploy에 접근할 수 있어야 하므로 권한에 `AmazonS3FullAccess` 와 `AWSCodeDeployFullAccess` 권한을 주고, **신뢰 관계**를 다음처럼 설정하면 OIDC 를 위한 역할 생성이 완료된다.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Effect": "Allow",
+          "Principal": {
+              "Federated": // 아까 발급한 자격 증명 공급자의 ARN을 입력한다. ex. "arn:aws:iam::0123456789:oidc-provider/token.actions.githubusercontent.com"
+          },
+          "Action": "sts:AssumeRoleWithWebIdentity",
+          "Condition": {
+              "StringEquals": {
+                  "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+              },
+              "StringLike": {
+                  "token.actions.githubusercontent.com:sub": // 접근할 유저, 레포, 브랜치 등을 정의한다. ex. "repo:ORG_OR_USER_NAME/REPOSITORY"
+              }
+          }
+      }
+  ]
+}
+```
+
+**3) 레포에 해당 역할을 시크릿 변수로 정의**
+
+생성한 역할(Role)의 ARN을 해당 레포에 `AWS_ROLE_TO_ASSUME` 라는 이름을 가진 시크릿 키로 설정한다.
+
+#### 5-6
+
+AWS 인증이 완료되면 서버를 띄울 때 정의할 환경 변수가 담긴 파일을 생성한다. 깃에 올라가면 안되는 민감한 정보나 깃에 올라갈 필요가 없는 변수들을 서버에 전달하기 위해 사용한다. `.env` 파일은 KEY=VALUE 가 여러 줄인 형식으로 정의되는데, 이 형식은 linux에서 `cat .env | xargs` 명령어를 통해 바로 시스템 변수로 만들 수 있으며 Spring 에서는 설정파일인 `application.yaml` 에서 시스템 변수를 바로 받을 수 있다.
+
+#### 5-7
+
+이제 서버에 띄울 파일들을 `zip` 으로 압축하고 aws cli 명령어를 통해 s3 버킷에 올린다. `zip` 파일의 이름은 쉬운 구분을 위해 깃헙 커밋 ID(`$GITHUB_SHA`)로 정의하였다.
+
+### [6] job: deploy
+
+앞선 `build` job이 성공적으로 완료되면 이 작업이 실행된다.
+
+aws cli 명령어인 `aws deploy code-deployment` 명령어를 통해 CodeDeploy가 실행되도록 요청한다.
+
+이 작업이 성공적으로 완료되기 위해서는 CodeDeploy에 서버 배포를 위한 CodeDeploy Group과 CodeDeploy App을 미리 만들어두어야 한다.
+
+####
